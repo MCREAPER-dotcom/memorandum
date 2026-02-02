@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Memorandum.Desktop.Views.SubfolderNameDialog"
+        Title="Вложенная папка"
+        Width="320"
+        Height="140"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource AppBackground}">
+  <StackPanel Margin="24" Spacing="16">
+    <TextBlock Text="Имя папки:" Foreground="{StaticResource PrimaryForeground}" FontSize="14" />
+    <TextBox x:Name="NameBox" Watermark="название папки" Classes="DarkInput" />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+      <Button Content="Отмена" Classes="SecondaryButton" Click="OnCancelClick" />
+      <Button Content="Создать" Classes="PrimaryButton" Click="OnOkClick" />
+    </StackPanel>
+  </StackPanel>
+</Window>

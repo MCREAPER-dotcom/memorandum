@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Memorandum.Desktop</RootNamespace>
+    <AssemblyName>Memorandum.Desktop</AssemblyName>
+    <AssemblyTitle>Memorandum</AssemblyTitle>
+    <Product>Memorandum</Product>
+    <Company>MCREAPER</Company>
+    <Copyright>Copyright © MCREAPER</Copyright>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="11.2.0.2" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Memorandum.Core\Memorandum.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Themes\AppResources.axaml" />
+    <AvaloniaResource Include="Themes\PaletteApp.axaml" />
+    <AvaloniaResource Include="Themes\PaletteTags.axaml" />
+    <AvaloniaResource Include="Themes\PaletteGraph.axaml" />
+    <AvaloniaResource Include="Themes\GraphViewStyles.axaml" />
+    <AvaloniaResource Include="Assets\Icons\**\*.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Sounds\Notification.mp3" Link="Sounds\Notification.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Memorandum-AppIcon.png" Link="Memorandum-AppIcon.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

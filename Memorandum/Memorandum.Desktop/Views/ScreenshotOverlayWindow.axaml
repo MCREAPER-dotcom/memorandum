@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Memorandum.Desktop.Views.ScreenshotOverlayWindow"
+        Title=""
+        SystemDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowState="Normal"
+        Topmost="True"
+        CanResize="False"
+        ShowInTaskbar="False"
+        Background="Transparent">
+  <Canvas x:Name="RootPanel" Background="Transparent">
+    <Border x:Name="DimTop" IsVisible="False" IsHitTestVisible="False" Background="#B2000000" />
+    <Border x:Name="DimBottom" IsVisible="False" IsHitTestVisible="False" Background="#B2000000" />
+    <Border x:Name="DimLeft" IsVisible="False" IsHitTestVisible="False" Background="#B2000000" />
+    <Border x:Name="DimRight" IsVisible="False" IsHitTestVisible="False" Background="#B2000000" />
+    <Border x:Name="SelectionBorder" IsVisible="False"
+            BorderBrush="White" BorderThickness="2"
+            Background="Transparent" IsHitTestVisible="False" />
+  </Canvas>
+</Window>

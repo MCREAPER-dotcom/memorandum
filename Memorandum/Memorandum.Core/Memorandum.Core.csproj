@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Memorandum.Core</RootNamespace>
+    <AssemblyName>Memorandum.Core</AssemblyName>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Version>1.0.0.0</Version>
+    <AssemblyTitle>Memorandum.Core</AssemblyTitle>
+    <Description>Ядро приложения Memorandum: сущности и контракты</Description>
+    <Product>Memorandum</Product>
+    <Company>MCREAPER</Company>
+    <Copyright>Copyright © MCREAPER</Copyright>
+  </PropertyGroup>
+</Project>

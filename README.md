@@ -1,4 +1,7 @@
 # memorandum
+
+**Автор: MCREAPER**
+
 <h1 align="center">Приложение заметок</h1>
 <h2 align="center">Основа:</h2>
 Создать графический интерфейс на основе wpf

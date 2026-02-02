@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Палитра: граф (подсказки, подписи, легенда) -->
+  <SolidColorBrush x:Key="GraphHintBackground" Color="#2e1065" />
+  <SolidColorBrush x:Key="GraphHintBorderBrush" Color="#5b21b6" />
+  <SolidColorBrush x:Key="GraphCaptionForeground" Color="#c4b5fd" />
+  <SolidColorBrush x:Key="GraphLinkForeground" Color="#a78bfa" />
+  <SolidColorBrush x:Key="GraphLabelSecondary" Color="#9ca3af" />
+  <SolidColorBrush x:Key="GraphLegendNoteBackground" Color="#2a2a3e" />
+  <SolidColorBrush x:Key="GraphLegendFolderBackground" Color="#374151" />
+  <SolidColorBrush x:Key="GraphLegendTagBackground" Color="#4b5563" />
+</ResourceDictionary>

@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Палитра: фон приложения, панели, сайдбар, рамки -->
+  <SolidColorBrush x:Key="AppBackground" Color="#0d0d12" />
+  <SolidColorBrush x:Key="SurfaceBackground" Color="#1a1a2e" />
+  <SolidColorBrush x:Key="SidebarSectionBackground" Color="#252538" />
+  <SolidColorBrush x:Key="GraphHeaderBackground" Color="#1a1a2e" />
+  <SolidColorBrush x:Key="GraphBorderBrush" Color="#4a4a6a" />
+  <SolidColorBrush x:Key="GraphPanelBackground" Color="#1e1e32" />
+  <!-- Поля ввода -->
+  <SolidColorBrush x:Key="InputFieldBackground" Color="#252538" />
+  <SolidColorBrush x:Key="InputFieldForeground" Color="#f3f4f6" />
+  <SolidColorBrush x:Key="InputFieldWatermark" Color="#6b7280" />
+  <!-- Основной текст и акценты -->
+  <SolidColorBrush x:Key="PrimaryForeground" Color="#f3f4f6" />
+  <SolidColorBrush x:Key="AccentBrush" Color="#7c3aed" />
+  <SolidColorBrush x:Key="AccentHoverBrush" Color="#a78bfa" />
+  <SolidColorBrush x:Key="AccentPressedBrush" Color="#5b21b6" />
+  <SolidColorBrush x:Key="ToolButtonHoverBrush" Color="#374151" />
+  <SolidColorBrush x:Key="ToolButtonPressedBrush" Color="#4b5563" />
+</ResourceDictionary>

@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Memorandum.Desktop.Views.StickerWindow"
+        Title=""
+        Width="280"
+        Height="200"
+        MinWidth="220"
+        MinHeight="160"
+        SystemDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        Background="{StaticResource StickerBackground}"
+        CanResize="True"
+        KeyDown="OnKeyDown">
+  <Border x:Name="RootBorder" BorderBrush="{StaticResource StickerBorder}" BorderThickness="2" CornerRadius="6"
+          Background="{StaticResource StickerBackground}"
+          PointerPressed="OnPointerPressed">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <Border Grid.Row="0" Padding="12,8" Background="Transparent" Cursor="SizeAll">
+        <Grid RowDefinitions="Auto,Auto">
+          <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <TextBlock x:Name="TimerText" Text="00:00" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource StickerForeground}" VerticalAlignment="Center" />
+            <Button x:Name="EditModeButton" Grid.Column="1" Content="Редактировать" Padding="8,4" FontSize="12"
+                    Background="#F0F0F0" Foreground="#1a1a1a" BorderThickness="0" Cursor="Hand"
+                    Click="OnEditModeClick" />
+          </Grid>
+          <TextBlock x:Name="DeadlineText" Grid.Row="1" Text="" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource StickerForeground}" Margin="0,4,0,0" IsVisible="False" />
+        </Grid>
+      </Border>
+      <ScrollViewer x:Name="ViewScroll" Grid.Row="1" Margin="12,0" VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="ContentPanel" Spacing="4" />
+      </ScrollViewer>
+      <Grid x:Name="EditPanel" Grid.Row="1" Margin="12,0" IsVisible="False">
+        <TextBox x:Name="EditContentBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"
+                 Background="#F8F8F8" Foreground="#1a1a1a" Watermark="Текст заметки..." />
+      </Grid>
+      <Border Grid.Row="2" Padding="12,8" BorderBrush="{StaticResource StickerHintForeground}" BorderThickness="0,1,0,0">
+        <Grid ColumnDefinitions="*,Auto" x:Name="FooterPanel">
+          <TextBlock Grid.Column="0" Text="Нажмите Ctrl+H для скрытия • Перетаскивайте для перемещения"
+                     FontSize="11" Foreground="{StaticResource StickerHintForeground}" TextWrapping="Wrap" />
+          <StackPanel x:Name="EditButtonsPanel" Grid.Column="1" Orientation="Horizontal" Spacing="8" IsVisible="False">
+            <Button x:Name="SaveButton" Content="Сохранить" Padding="8,4" FontSize="12" Background="#2d7d2d" Foreground="White" BorderThickness="0" Cursor="Hand" Click="OnSaveClick" />
+            <Button x:Name="CancelEditButton" Content="Отмена" Padding="8,4" FontSize="12" Background="#666" Foreground="White" BorderThickness="0" Cursor="Hand" Click="OnCancelEditClick" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</Window>

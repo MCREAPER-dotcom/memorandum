@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Memorandum.Desktop.Views.ClipboardToastWindow"
+        Title=""
+        Width="320"
+        Height="80"
+        WindowStartupLocation="Manual"
+        SystemDecorations="None"
+        Topmost="True"
+        CanResize="False"
+        Background="{StaticResource AppBackground}"
+        Padding="20,16">
+  <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+    <TextBlock Text="✓" Foreground="{StaticResource AccentBrush}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" />
+    <TextBlock Text="Изображение скопировано в буфер обмена" Foreground="{StaticResource PrimaryForeground}" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" />
+  </StackPanel>
+</Window>

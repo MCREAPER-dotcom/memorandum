@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Memorandum.Desktop.Views.TagNameDialog"
+        Title="Новый тег"
+        Width="320"
+        Height="220"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource AppBackground}">
+  <StackPanel Margin="24" Spacing="16">
+    <TextBlock Text="Введите название тега:" Foreground="{StaticResource PrimaryForeground}" FontSize="14" />
+    <TextBox x:Name="TagNameBox" Watermark="название тега" Classes="DarkInput" />
+    <TextBlock Text="Цвет тега:" Foreground="{StaticResource PrimaryForeground}" FontSize="14" />
+    <WrapPanel x:Name="ColorPanel" Orientation="Horizontal" />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+      <Button Content="Отмена" Classes="SecondaryButton" Click="OnCancelClick" />
+      <Button Content="Создать" Classes="PrimaryButton" Click="OnOkClick" />
+    </StackPanel>
+  </StackPanel>
+</Window>

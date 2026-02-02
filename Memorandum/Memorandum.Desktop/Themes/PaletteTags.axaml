@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Палитра: стикер (фон, рамка, текст) -->
+  <SolidColorBrush x:Key="StickerBackground" Color="#fffde7" />
+  <SolidColorBrush x:Key="StickerBorder" Color="#0a0a0a" />
+  <SolidColorBrush x:Key="StickerForeground" Color="#1a1a1a" />
+  <SolidColorBrush x:Key="StickerHintForeground" Color="#6b7280" />
+  <!-- Тип заметки на карточке: обычная / стикер -->
+  <SolidColorBrush x:Key="NoteTypeNormalBackground" Color="#e4e4e7" />
+  <SolidColorBrush x:Key="NoteTypeNormalForeground" Color="#1f2937" />
+  <SolidColorBrush x:Key="NoteTypeStickerBackground" Color="#c2410c" />
+  <SolidColorBrush x:Key="NoteTypeStickerForeground" Color="#ffffff" />
+  <!-- Тип пресета в списке: стикер / обычная -->
+  <SolidColorBrush x:Key="PresetTypeStickerBackground" Color="#b45309" />
+  <SolidColorBrush x:Key="PresetTypeNormalBackground" Color="#6b7280" />
+  <!-- Палитра тегов (ключи см. в PaletteConstants.TagPillResourceKeys) -->
+  <SolidColorBrush x:Key="TagPillPurple" Color="#5b21b6" />
+  <SolidColorBrush x:Key="TagPillGreen" Color="#15803d" />
+  <SolidColorBrush x:Key="TagPillRed" Color="#b91c1c" />
+  <SolidColorBrush x:Key="TagPillCyan" Color="#0e7490" />
+  <SolidColorBrush x:Key="TagPillYellow" Color="#a16207" />
+</ResourceDictionary>

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Memorandum")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("MCREAPER")]
 [assembly: AssemblyProduct("Memorandum")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
+[assembly: AssemblyCopyright("Copyright © MCREAPER")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

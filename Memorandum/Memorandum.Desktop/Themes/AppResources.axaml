@@ -1,0 +1,9 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Центральный файл ресурсов приложения. Все кисти и цвета подключаются через объединённые словари. -->
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://Memorandum.Desktop/Themes/PaletteApp.axaml" />
+    <ResourceInclude Source="avares://Memorandum.Desktop/Themes/PaletteTags.axaml" />
+    <ResourceInclude Source="avares://Memorandum.Desktop/Themes/PaletteGraph.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

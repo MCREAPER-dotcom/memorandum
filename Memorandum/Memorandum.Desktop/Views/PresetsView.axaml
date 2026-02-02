@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Memorandum.Desktop.Views.PresetsView"
+             Background="{StaticResource AppBackground}">
+  <Grid RowDefinitions="Auto,*">
+    <Border Grid.Row="0" Classes="AppHeader">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <Button x:Name="BackButton" Content="Назад" Classes="SecondaryButton" Click="OnBackClick" />
+          <TextBlock Text="Пресеты" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
+        </StackPanel>
+        <Panel Grid.Column="1" />
+        <Button Grid.Column="2" x:Name="CreatePresetButton" Content="+ Создать пресет" Classes="PrimaryButton" Click="OnCreatePresetClick" />
+      </Grid>
+    </Border>
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+      <Border Grid.Column="0" Width="280" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="0,0,1,0" Padding="16">
+        <ScrollViewer>
+          <StackPanel Spacing="0">
+            <TextBlock Text="Доступные пресеты" Foreground="{StaticResource GraphLabelSecondary}" FontSize="12" Margin="0,0,0,12" />
+            <ListBox x:Name="PresetsList" Background="Transparent" BorderThickness="0" SelectionChanged="OnPresetSelectionChanged">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Border Margin="0,0,0,8" Padding="12" Background="{StaticResource GraphPanelBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="8">
+                    <Grid RowDefinitions="Auto,Auto,Auto">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
+                        <Border Grid.Column="1" Width="16" Height="16" CornerRadius="2" Background="{Binding ColorBrush}" VerticalAlignment="Center" />
+                      </Grid>
+                      <TextBlock Grid.Row="1" Text="{Binding Details}" FontSize="12" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,4,0,0" />
+                      <Border Grid.Row="2" Margin="0,6,0,0" Padding="6,2" CornerRadius="4" HorizontalAlignment="Left" Background="{Binding TypeBackground}">
+                        <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{StaticResource PrimaryForeground}" />
+                      </Border>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+      <Border Grid.Column="1" Background="{StaticResource AppBackground}" Padding="48">
+        <ScrollViewer>
+          <StackPanel Spacing="24" MaxWidth="400">
+            <StackPanel x:Name="PlaceholderPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+              <TextBlock Text="Выберите пресет для просмотра деталей или создайте новый" FontSize="16" Foreground="{StaticResource GraphLabelSecondary}" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+            <StackPanel x:Name="DetailPanel" IsVisible="False" Spacing="20">
+              <TextBlock x:Name="DetailTitle" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Прозрачность:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
+                <TextBlock x:Name="DetailTransparency" Grid.Row="0" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Длительность:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
+                <TextBlock x:Name="DetailDuration" Grid.Row="1" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Тип:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
+                <TextBlock x:Name="DetailType" Grid.Row="2" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Тег(и):" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
+                <TextBlock x:Name="DetailTags" Grid.Row="3" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Цвет:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,0" />
+                <Border x:Name="DetailColorSwatch" Grid.Row="4" Grid.Column="1" Width="24" Height="24" CornerRadius="4" />
+              </Grid>
+              <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+                <Button x:Name="ApplyPresetButton" Content="Применить пресет" Classes="PrimaryButton" Click="OnApplyPresetClick" />
+                <Button x:Name="EditPresetButton" Content="Редактировать" Classes="SecondaryButton" Click="OnEditPresetClick" />
+                <Button x:Name="DeletePresetButton" Content="Удалить" Background="{StaticResource TagPillRed}" Foreground="{StaticResource PrimaryForeground}" Click="OnDeletePresetClick" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel x:Name="FormPanel" Classes="PresetForm" IsVisible="False" Spacing="16">
+              <TextBlock x:Name="FormTitleLabel" Text="Новый пресет" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
+              <TextBlock Text="Название:" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <TextBox x:Name="FormTitleBox" Watermark="Название пресета" Classes="DarkInput" />
+              <TextBlock Text="Прозрачность (%):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <TextBox x:Name="FormTransparencyBox" Watermark="95" Classes="DarkInput" />
+              <TextBlock Text="Длительность (мин, необязательно):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <TextBox x:Name="FormDurationBox" Watermark="15" Classes="DarkInput" />
+              <TextBlock Text="Тип:" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <StackPanel Orientation="Horizontal" Spacing="16">
+                <RadioButton x:Name="FormTypeSticker" Content="Стикер" GroupName="PresetType" />
+                <RadioButton x:Name="FormTypeRegular" Content="Обычная" GroupName="PresetType" IsChecked="True" />
+              </StackPanel>
+              <TextBlock Text="Тег(и), через запятую:" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <TextBox x:Name="FormTagsBox" Watermark="важное, встреча" Classes="DarkInput" />
+              <TextBlock Text="Цвет (#hex):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <TextBox x:Name="FormColorBox" Watermark="#dc2626" Classes="DarkInput" />
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="FormSaveButton" Content="Сохранить" Classes="PrimaryButton" Click="OnFormSaveClick" />
+                <Button x:Name="FormCancelButton" Content="Отмена" Classes="SecondaryButton" Click="OnFormCancelClick" />
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>
