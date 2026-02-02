@@ -1,2 +1,0 @@
-# memorandum
-memorandum
