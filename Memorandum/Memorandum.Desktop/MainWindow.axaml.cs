@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -22,7 +23,7 @@ using Memorandum.Desktop.Views;
 
 namespace Memorandum.Desktop;
 
-public partial class MainWindow : Window
+public partial class MainWindow : Window, IModalOverlayHost
 {
     private readonly MainViewModel _mainVm;
     private readonly NotesListView _notesListView;
@@ -36,10 +37,13 @@ public partial class MainWindow : Window
     private IntPtr _mainWindowHandle;
     private readonly HashSet<string> _remindedDeadlineKeys = new();
     private DispatcherTimer? _deadlineReminderTimer;
+    private TagNameDialog? _tagDialog;
+    private SubfolderNameDialog? _folderDialog;
 
     public MainWindow()
     {
         InitializeComponent();
+        WindowState = WindowState.Maximized;
         TrySetWindowIcon();
         _mainVm = new MainViewModel();
         _mainVm.ShowNoteEditRequested = note => ShowNoteEdit(note);
@@ -59,7 +63,10 @@ public partial class MainWindow : Window
         _noteEditView = new NoteEditView
         {
             OnBack = () => { ContentArea.Content = GetViewForPage(); SelectNavButton(AllNotesButton); },
-            OnTagCreated = name => { _mainVm.AddKnownTag(name); RefreshSidebarFromViewModel(); }
+            OnTagCreated = (name, colorKey) => { _mainVm.AddKnownTag(name, colorKey); RefreshSidebarFromViewModel(); },
+            OnAddFolderRequested = OnNoteEditAddFolder,
+            OnAddSubfolderRequested = OnNoteEditAddSubfolder,
+            ShowTagDialogAsync = ShowTagDialogAsync
         };
 
         DataContext = _mainVm;
@@ -115,6 +122,15 @@ public partial class MainWindow : Window
                 Dispatcher.UIThread.Post(CaptureScreenToClipboardAsync));
             RegisterAppHotkeys();
         }
+
+        var preloadTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        preloadTimer.Tick += (_, _) =>
+        {
+            preloadTimer.Stop();
+            EnsureTagDialog();
+            EnsureFolderDialog();
+        };
+        preloadTimer.Start();
     }
 
     private void OnMainWindowClosed(object? sender, EventArgs e)
@@ -232,10 +248,33 @@ public partial class MainWindow : Window
         return _graphView;
     }
 
+    private void EnsureFolderDialog()
+    {
+        if (_folderDialog == null)
+            _folderDialog = new SubfolderNameDialog();
+    }
+
+    private void EnsureTagDialog()
+    {
+        if (_tagDialog == null)
+            _tagDialog = new TagNameDialog();
+    }
+
+    void IModalOverlayHost.SetModalOverlayVisible(bool visible)
+    {
+        ModalOverlay.IsVisible = visible;
+    }
+
+    private async Task<TagCreationResult?> ShowTagDialogAsync(string title)
+    {
+        EnsureTagDialog();
+        return await _tagDialog!.ShowModalReusableAsync(this, title);
+    }
+
     private async Task<string?> ShowSubfolderDialog()
     {
-        var dlg = new SubfolderNameDialog { Title = "Вложенная папка" };
-        return await dlg.ShowDialog<string?>(this);
+        EnsureFolderDialog();
+        return await _folderDialog!.ShowModalReusableAsync(this, "Вложенная папка");
     }
 
     private void RefreshSidebarFromViewModel()
@@ -261,7 +300,7 @@ public partial class MainWindow : Window
         TagsList.Children.Clear();
         foreach (var item in _mainVm.TagItems)
         {
-            var brush = TagBrushConverter.Convert(item.Name, typeof(IBrush), null, CultureInfo.CurrentCulture) as IBrush ?? Brushes.Gray;
+            var brush = GetTagBrush(item);
             var dot = new Border { Width = 12, Height = 12, CornerRadius = new CornerRadius(6), Background = brush, VerticalAlignment = VerticalAlignment.Center };
             var label = new TextBlock { Text = $"{item.Name} ({item.Count})", VerticalAlignment = VerticalAlignment.Center };
             var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Children = { dot, label } };
@@ -273,22 +312,14 @@ public partial class MainWindow : Window
         if (ContentArea.Content == _noteEditView)
         {
             _noteEditView.SetFolders(_mainVm.GetFoldersForEdit());
-            _noteEditView.SetAvailableTags(_mainVm.GetTagNamesForEdit());
+            _noteEditView.SetAvailableTags(_mainVm.GetTagNamesForEdit(), _mainVm.GetTagColorKeys());
         }
     }
 
     private void TrySetWindowIcon()
     {
-        try
-        {
-            var path = System.IO.Path.Combine(AppContext.BaseDirectory, "Memorandum-AppIcon.png");
-            if (System.IO.File.Exists(path))
-                Icon = new WindowIcon(path);
-        }
-        catch
-        {
-            // иконка не задана
-        }
+        if (AppIconCache.Icon != null)
+            Icon = AppIconCache.Icon;
     }
 
     private void LoadSidebarIcons()
@@ -298,6 +329,13 @@ public partial class MainWindow : Window
         SetSvgIcon(IconGraph, "avares://Memorandum.Desktop/Assets/Icons/diagram.svg");
         SetSvgIcon(IconFolders, "avares://Memorandum.Desktop/Assets/Icons/folders.svg");
         SetSvgIcon(IconTags, "avares://Memorandum.Desktop/Assets/Icons/brand.svg");
+    }
+
+    private static IBrush GetTagBrush(ViewModels.TagItemViewModel item)
+    {
+        if (!string.IsNullOrEmpty(item.ColorKey) && Avalonia.Application.Current?.Resources?.TryGetResource(item.ColorKey, null, out var value) == true && value is IBrush b)
+            return b;
+        return TagBrushConverter.Convert(item.Name, typeof(IBrush), null, CultureInfo.CurrentCulture) as IBrush ?? Brushes.Gray;
     }
 
     private static void SetSvgIcon(Image imageControl, string avaresPath)
@@ -328,22 +366,25 @@ public partial class MainWindow : Window
     private void ShowNoteEdit(NoteCardItem? item, PresetItem? preset = null)
     {
         _noteEditView.SetFolders(_mainVm.GetFoldersForEdit());
-        _noteEditView.SetAvailableTags(_mainVm.GetTagNamesForEdit());
+        _noteEditView.SetAvailableTags(_mainVm.GetTagNamesForEdit(), _mainVm.GetTagColorKeys());
         _noteEditView.SetNote(item, preset);
         _noteEditView.OnSaveRequested = (title, description, content, folder, tags, isSticker, editingNote, durationMinutes, backgroundColorHex, transparencyPercent, isClickThrough, isPinned, closeOnTimerEnd, deadline) =>
         {
             var preview = description ?? "";
             var typeLabel = isSticker ? "Стикер" : "Обычная";
-            var dateText = DateTime.Now.ToString("dd.MM.yyyy");
+            var now = DateTime.UtcNow;
             NoteCardItem? newItem = null;
             newItem = new NoteCardItem(
-                title, preview, content, typeLabel, folder ?? "", tags, dateText, isSticker,
+                title, preview, content, typeLabel, folder ?? "", tags, isSticker,
                 () => ShowNoteEdit(newItem!),
                 () => OpenSticker(newItem!),
                 durationMinutes,
                 () => OpenSticker(newItem!),
                 () => CloseStickerForNote(newItem!),
-                backgroundColorHex, transparencyPercent, isClickThrough, isPinned, closeOnTimerEnd, deadline);
+                backgroundColorHex, transparencyPercent, isClickThrough, isPinned, closeOnTimerEnd, deadline,
+                id: editingNote?.Id,
+                createdAt: editingNote?.CreatedAt,
+                lastEditedAt: now);
             if (editingNote != null)
                 _mainVm.NotesList.ReplaceNote(editingNote, newItem);
             else
@@ -365,8 +406,8 @@ public partial class MainWindow : Window
 
     private async void OnAddFolderClick(object? sender, RoutedEventArgs e)
     {
-        var dlg = new SubfolderNameDialog { Title = "Добавить папку" };
-        var name = await dlg.ShowDialog<string?>(this);
+        EnsureFolderDialog();
+        var name = await _folderDialog!.ShowModalReusableAsync(this, "Добавить папку");
         if (!string.IsNullOrWhiteSpace(name))
         {
             _mainVm.AddRootFolder(name!);
@@ -374,13 +415,34 @@ public partial class MainWindow : Window
         }
     }
 
+    private async System.Threading.Tasks.Task OnNoteEditAddFolder()
+    {
+        EnsureFolderDialog();
+        var name = await _folderDialog!.ShowModalReusableAsync(this, "Добавить папку");
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            _mainVm.AddRootFolder(name!);
+            RefreshSidebarFromViewModel();
+        }
+    }
+
+    private async System.Threading.Tasks.Task OnNoteEditAddSubfolder(string parentPath)
+    {
+        EnsureFolderDialog();
+        var name = await _folderDialog!.ShowModalReusableAsync(this, "Вложенная папка");
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            _mainVm.AddSubfolderWithName(parentPath, name!);
+            RefreshSidebarFromViewModel();
+        }
+    }
+
     private async void OnAddTagClick(object? sender, RoutedEventArgs e)
     {
-        var dlg = new TagNameDialog { Title = "Добавить тег" };
-        var result = await dlg.ShowDialog<TagCreationResult?>(this);
+        var result = await ShowTagDialogAsync("Добавить тег");
         if (result != null)
         {
-            _mainVm.AddKnownTag(result.Name);
+            _mainVm.AddKnownTag(result.Name, result.ColorKey);
             RefreshSidebarFromViewModel();
         }
     }
@@ -434,13 +496,16 @@ public partial class MainWindow : Window
     {
         NoteCardItem? newItem = null;
         newItem = new NoteCardItem(
-            oldNote.Title, oldNote.Preview, newContent, oldNote.TypeLabel, oldNote.FolderName, oldNote.TagLabels, oldNote.DateText, oldNote.IsSticker,
+            oldNote.Title, oldNote.Preview, newContent, oldNote.TypeLabel, oldNote.FolderName, oldNote.TagLabels, oldNote.IsSticker,
             () => ShowNoteEdit(newItem!),
             () => OpenSticker(newItem!),
             oldNote.DurationMinutes,
             () => OpenSticker(newItem!),
             () => CloseStickerForNote(newItem!),
-            oldNote.BackgroundColorHex, oldNote.TransparencyPercent, oldNote.IsClickThrough, oldNote.IsPinned, oldNote.CloseOnTimerEnd, oldNote.Deadline);
+            oldNote.BackgroundColorHex, oldNote.TransparencyPercent, oldNote.IsClickThrough, oldNote.IsPinned, oldNote.CloseOnTimerEnd, oldNote.Deadline,
+            id: oldNote.Id,
+            createdAt: oldNote.CreatedAt,
+            lastEditedAt: DateTime.UtcNow);
         return newItem;
     }
 
@@ -456,10 +521,9 @@ public partial class MainWindow : Window
 
     private void OpenNoteInInterface(string title, string content)
     {
-        var dateText = DateTime.Now.ToString("dd.MM.yyyy");
         NoteCardItem? tempItem = null;
         tempItem = new NoteCardItem(
-            title, content, content, "Обычная", "", Array.Empty<string>(), dateText, false,
+            title, content, content, "Обычная", "", Array.Empty<string>(), false,
             () => ShowNoteEdit(tempItem!),
             () => { },
             null,

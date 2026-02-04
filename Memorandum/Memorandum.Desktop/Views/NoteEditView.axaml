@@ -1,9 +1,13 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="using:Memorandum.Desktop.Views"
+             xmlns:controls="using:Memorandum.Desktop.Controls"
              x:Class="Memorandum.Desktop.Views.NoteEditView"
              Classes="NoteEditForm"
-             Background="{StaticResource AppBackground}">
-  <Grid RowDefinitions="Auto,*">
+             Background="{StaticResource AppBackground}"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+  <Grid RowDefinitions="Auto,*" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <Border Grid.Row="0" Classes="AppHeader">
       <Grid ColumnDefinitions="Auto,*,Auto">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
@@ -18,8 +22,9 @@
         </StackPanel>
       </Grid>
     </Border>
-    <ScrollViewer Grid.Row="1" Padding="24">
-      <Grid ColumnDefinitions="*,*" Margin="0,16,0,0" RowDefinitions="Auto">
+    <controls:ScrollableContentArea Grid.Row="1" Padding="24,24,24,0">
+      <StackPanel Margin="0,16,0,0">
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
         <StackPanel Grid.Column="0" Spacing="20" Margin="0,0,20,0">
           <Border Classes="NoteEditCard">
             <StackPanel Spacing="12">
@@ -30,9 +35,9 @@
           <Border Classes="NoteEditCard">
             <StackPanel Spacing="12">
               <TextBlock Text="Содержимое" Classes="SectionLabel" />
-              <TextBlock Text="Описание заметки" Foreground="{StaticResource GraphLabelSecondary}" FontSize="12" Margin="0,0,0,4" />
+              <TextBlock Text="Описание заметки" Classes="StaticLabelSmall" Margin="0,0,0,4" />
               <TextBox x:Name="DescriptionBox" MinHeight="60" MaxHeight="120" Watermark="Краткое описание для карточки..." TextWrapping="Wrap" Classes="DarkInput" AcceptsReturn="True" />
-              <TextBlock Text="Полный текст заметки" Foreground="{StaticResource GraphLabelSecondary}" FontSize="12" Margin="0,8,0,4" />
+              <TextBlock Text="Полный текст заметки" Classes="StaticLabelSmall" Margin="0,8,0,4" />
               <Border Background="{StaticResource InputFieldBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12" MinHeight="80" Margin="0,0,0,8">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="220">
                   <ItemsControl x:Name="ContentBlocksControl" ItemTemplate="{StaticResource ContentBlockTemplateSelector}">
@@ -58,7 +63,7 @@
           </Border>
           <Border x:Name="ImageDropZone" Classes="NoteEditCard ImageDropZone" Padding="24" MinHeight="120" Cursor="Hand">
             <StackPanel Spacing="12" VerticalAlignment="Center" HorizontalAlignment="Center">
-              <TextBlock Text="Загрузить изображение или вставить из буфера" Foreground="{StaticResource GraphLabelSecondary}" HorizontalAlignment="Center" FontSize="14" IsHitTestVisible="False" />
+              <TextBlock Text="Загрузить изображение или вставить из буфера" Classes="StaticLabel" HorizontalAlignment="Center" IsHitTestVisible="False" />
               <Button x:Name="PasteFromClipboardButton" Content="Вставить из буфера" Classes="SecondaryButton" HorizontalAlignment="Center" Click="OnPasteFromClipboardClick" />
             </StackPanel>
           </Border>
@@ -79,16 +84,17 @@
               <TextBox x:Name="TimerDurationBox" Watermark="15" Classes="DarkInput" />
             </StackPanel>
           </Border>
-          <Border Classes="NoteEditCard">
-            <StackPanel Spacing="12">
+          <Border Classes="NoteEditCard" ClipToBounds="False">
+            <StackPanel Spacing="12" ClipToBounds="False">
               <TextBlock Text="Дедлайн" Classes="SectionLabel" />
-              <TextBlock Text="Дата и время (дд.мм.гггг чч:мм), пусто — без дедлайна" Foreground="{StaticResource GraphLabelSecondary}" FontSize="12" />
-              <TextBox x:Name="DeadlineBox" Watermark="31.12.2025 18:00" Classes="DarkInput" />
+              <TextBlock Text="Выберите дату и время или нажмите «Без дедлайна»" Classes="StaticLabelSmall" />
+              <views:DeadlinePickerControl x:Name="DeadlinePickerControl" />
             </StackPanel>
           </Border>
           <Border Classes="NoteEditCard">
             <StackPanel Spacing="12">
               <TextBlock Text="Папка" Classes="SectionLabel" />
+              <Button x:Name="AddFolderButton" Content="+ Добавить папку" Classes="GraphLinkButton" HorizontalAlignment="Left" Click="OnAddFolderClick" />
               <ScrollViewer MaxHeight="200" HorizontalScrollBarVisibility="Auto">
                 <StackPanel x:Name="FolderPanel" Spacing="2" />
               </ScrollViewer>
@@ -104,9 +110,9 @@
           <Border Classes="NoteEditCard">
             <StackPanel Spacing="10">
               <TextBlock Text="Оформление стикера" Classes="SectionLabel" />
-              <TextBlock Text="Цвет фона (#hex):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <TextBlock Text="Цвет фона (#hex):" Classes="StaticLabel" />
               <TextBox x:Name="StickerBackgroundBox" Watermark="#fffde7" Classes="DarkInput" />
-              <TextBlock Text="Прозрачность (%):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
+              <TextBlock Text="Прозрачность (%):" Classes="StaticLabel" />
               <TextBox x:Name="StickerTransparencyBox" Watermark="100" Classes="DarkInput" />
               <CheckBox x:Name="StickerClickThroughCheck" Content="Пропускать клики сквозь окно" Foreground="{StaticResource PrimaryForeground}" />
               <CheckBox x:Name="StickerPinnedCheck" Content="Поверх всех окон" Foreground="{StaticResource PrimaryForeground}" IsChecked="True" />
@@ -115,6 +121,8 @@
           </Border>
         </StackPanel>
       </Grid>
-    </ScrollViewer>
+        <Border Height="120" Background="Transparent" IsHitTestVisible="False" />
+      </StackPanel>
+    </controls:ScrollableContentArea>
   </Grid>
 </UserControl>

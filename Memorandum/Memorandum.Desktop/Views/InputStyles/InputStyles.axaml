@@ -1,0 +1,143 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Своя тема для ListBoxItem — ярко-фиолетовый выбранный пункт вместо синего Fluent -->
+  <Style Selector="ListBoxItem">
+    <Setter Property="Theme" Value="{StaticResource AppListBoxItemTheme}" />
+  </Style>
+  <!-- Текстовые поля и выпадающие списки -->
+  <Style Selector="TextBox.DarkInput">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="Padding" Value="12,10" />
+  </Style>
+  <Style Selector="TextBox.DarkInput:focus">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="TextBox.DarkInput:focus /template/ Border">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+  </Style>
+  <Style Selector="ComboBox.DarkInput">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="Padding" Value="12,10" />
+  </Style>
+  <!-- Выпадающая панель ComboBox (попап в overlay) -->
+  <Style Selector="ComboBox Popup Border">
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+  <Style Selector="ComboBox.DarkInput Popup Border">
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+  </Style>
+  <Style Selector="Popup Border">
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+  </Style>
+  <Style Selector="ComboBox ListBox">
+    <Setter Property="ItemContainerTheme" Value="{StaticResource AppListBoxItemTheme}" />
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="Popup ListBox">
+    <Setter Property="ItemContainerTheme" Value="{StaticResource AppListBoxItemTheme}" />
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="ComboBox ListBoxItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="Popup ListBoxItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="ComboBox ListBoxItem:pointerover">
+    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
+  </Style>
+  <Style Selector="Popup ListBoxItem:pointerover">
+    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
+  </Style>
+  <Style Selector="ComboBox ListBoxItem:selected">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+  </Style>
+  <Style Selector="Popup ListBoxItem:selected">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+  </Style>
+  <!-- Во Fluent фон рисует ContentPresenter#PART_ContentPresenter, не Border -->
+  <Style Selector="ComboBox ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+  </Style>
+  <Style Selector="Popup ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+  </Style>
+  <Style Selector="ComboBox ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+  </Style>
+  <Style Selector="Popup ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+  </Style>
+  <Style Selector="ComboBox ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="Popup ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="ComboBox ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
+  </Style>
+  <Style Selector="Popup ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
+  </Style>
+  <Style Selector="UserControl.NoteEditForm TextBox">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="Padding" Value="12,10" />
+  </Style>
+  <Style Selector="UserControl.NoteEditForm ComboBox">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="Padding" Value="12,10" />
+  </Style>
+  <!-- Запасной вариант: выпадающий список может рендериться без Popup в предках -->
+  <Style Selector="ListBox">
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="ListBoxItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
+  </Style>
+  <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+  </Style>
+  <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+  </Style>
+</Styles>

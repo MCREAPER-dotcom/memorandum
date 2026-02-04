@@ -1,0 +1,88 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Календарь дедлайна: тёмная тема -->
+  <Style Selector="Calendar.DeadlineCalendar">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="8" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ Button:pointerover">
+    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ Button:selected">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ Button:selected Border">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <!-- Кнопки дней внутри CalendarItem (вложенный шаблон во Fluent) -->
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ Button:selected">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ Button:selected Border">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ CalendarDayButton:selected">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ CalendarDayButton:selected Border">
+    <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <!-- Дни прошлого и следующего месяца — тёмно-фиолетовые плитки -->
+  <Style Selector="Calendar.DeadlineCalendar /template/ Button:inactive">
+    <Setter Property="Background" Value="#2d1b4e" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ Button:inactive Border">
+    <Setter Property="Background" Value="#2d1b4e" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+  </Style>
+  <Style Selector="TimePicker.DeadlinePicker">
+    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="Padding" Value="12,14" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="ClipToBounds" Value="False" />
+  </Style>
+  <Style Selector="TimePicker.DeadlinePicker /template/ Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Padding" Value="12,14" />
+    <Setter Property="ClipToBounds" Value="False" />
+  </Style>
+  <Style Selector="TimePicker.DeadlinePicker /template/ TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+</Styles>

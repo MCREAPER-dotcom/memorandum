@@ -1,0 +1,24 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Стили статичного текста (лейблы, подписи). Меняйте здесь размер, начертание и привязку к ресурсам цвета. -->
+  <Style Selector="TextBlock.SectionLabel">
+    <Setter Property="Foreground" Value="{StaticResource LabelForeground}" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="TextBlock.StaticLabel">
+    <Setter Property="Foreground" Value="{StaticResource LabelForeground}" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+  <Style Selector="TextBlock.StaticLabelSmall">
+    <Setter Property="Foreground" Value="{StaticResource LabelForeground}" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+  <Style Selector="TextBlock.StaticLabelSecondary">
+    <Setter Property="Foreground" Value="{StaticResource LabelSecondaryForeground}" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+  <Style Selector="UserControl.NoteEditForm RadioButton, StackPanel.PresetForm RadioButton, UserControl.NoteEditForm CheckBox">
+    <Setter Property="Foreground" Value="{StaticResource LabelForeground}" />
+  </Style>
+</Styles>

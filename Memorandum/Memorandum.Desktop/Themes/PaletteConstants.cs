@@ -15,7 +15,22 @@ public static class PaletteConstants
         "TagPillGreen",
         "TagPillRed",
         "TagPillCyan",
-        "TagPillYellow"
+        "TagPillYellow",
+        "TagPillOrange",
+        "TagPillPink",
+        "TagPillBlue",
+        "TagPillIndigo",
+        "TagPillTeal",
+        "TagPillLime",
+        "TagPillAmber",
+        "TagPillRose",
+        "TagPillSky",
+        "TagPillViolet",
+        "TagPillFuchsia",
+        "TagPillEmerald",
+        "TagPillSlate",
+        "TagPillCoral",
+        "TagPillMint"
     };
 
     /// <summary>Теги по умолчанию → ключ ресурса палитры тегов.</summary>

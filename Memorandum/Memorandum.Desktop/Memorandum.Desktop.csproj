@@ -15,7 +15,7 @@
     <PackageReference Include="Avalonia" Version="11.2.0" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.0" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0" />
+    <PackageReference Include="Quick.AvaloniaFonts.Roboto" Version="1.0.0" />
     <PackageReference Include="Avalonia.Svg.Skia" Version="11.2.0.2" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
@@ -29,7 +29,20 @@
     <AvaloniaResource Include="Themes\PaletteApp.axaml" />
     <AvaloniaResource Include="Themes\PaletteTags.axaml" />
     <AvaloniaResource Include="Themes\PaletteGraph.axaml" />
+    <AvaloniaResource Include="Themes\ScrollBarFluentOverrides.axaml" />
+    <AvaloniaResource Include="Themes\FontStyles.axaml" />
+    <AvaloniaResource Include="Themes\ListBoxItemTheme.axaml" />
     <AvaloniaResource Include="Themes\GraphViewStyles.axaml" />
+    <AvaloniaResource Include="Views\WindowFrame\WindowFrameStyles.axaml" />
+    <AvaloniaResource Include="Views\TextStyles\StaticTextResources.axaml" />
+    <AvaloniaResource Include="Views\TextStyles\StaticTextStyles.axaml" />
+    <AvaloniaResource Include="Views\DeadlineStyles\DeadlineStyles.axaml" />
+    <AvaloniaResource Include="Views\SliderStyles\SliderStyles.axaml" />
+    <AvaloniaResource Include="Views\ScrollBarStyles\ScrollBarStyles.axaml" />
+    <AvaloniaResource Include="Views\SearchStyles\SearchStyles.axaml" />
+    <AvaloniaResource Include="Views\ButtonStyles\ButtonStyles.axaml" />
+    <AvaloniaResource Include="Views\InputStyles\InputStyles.axaml" />
+    <AvaloniaResource Include="Controls\ScrollableContentArea.axaml" />
     <AvaloniaResource Include="Assets\Icons\**\*.svg" />
   </ItemGroup>
   <ItemGroup>

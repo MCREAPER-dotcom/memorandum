@@ -1,0 +1,25 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Memorandum.Desktop.Controls">
+  <Style Selector="controls|ScrollableContentArea">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ScrollViewer x:Name="PART_ScrollViewer" Focusable="False"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Padding="{TemplateBinding Padding}">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top" />
+        </ScrollViewer>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>

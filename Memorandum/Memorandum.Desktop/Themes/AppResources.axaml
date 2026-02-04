@@ -5,5 +5,7 @@
     <ResourceInclude Source="avares://Memorandum.Desktop/Themes/PaletteApp.axaml" />
     <ResourceInclude Source="avares://Memorandum.Desktop/Themes/PaletteTags.axaml" />
     <ResourceInclude Source="avares://Memorandum.Desktop/Themes/PaletteGraph.axaml" />
+    <ResourceInclude Source="avares://Memorandum.Desktop/Themes/ScrollBarFluentOverrides.axaml" />
+    <ResourceInclude Source="avares://Memorandum.Desktop/Themes/ListBoxItemTheme.axaml" />
   </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

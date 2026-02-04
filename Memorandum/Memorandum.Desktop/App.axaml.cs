@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Svg.Skia;
+using Memorandum.Desktop.Services;
+using Memorandum.Desktop.Views;
 
 namespace Memorandum.Desktop;
 
@@ -33,6 +35,9 @@ public partial class App : Application
         {
             // иконки таймера не загружены
         }
+
+        AppIconCache.Preload();
+        TagNameDialog.Preload();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

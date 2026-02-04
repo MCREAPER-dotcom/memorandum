@@ -1,0 +1,59 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Полоса прокрутки: без фона трека, закруглённый ползунок -->
+  <Style Selector="ScrollBar">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="Transparent" />
+    <Setter Property="Width" Value="16" />
+    <Setter Property="MinWidth" Value="16" />
+  </Style>
+  <Style Selector="ScrollBar:vertical">
+    <Setter Property="Width" Value="16" />
+  </Style>
+  <Style Selector="ScrollBar:horizontal">
+    <Setter Property="Height" Value="16" />
+  </Style>
+  <!-- Трек без фона: в Fluent трек рисует Rectangle#TrackRect -->
+  <Style Selector="ScrollBar /template/ Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+  <Style Selector="ScrollBar /template/ Rectangle#TrackRect">
+    <Setter Property="Fill" Value="Transparent" />
+    <Setter Property="Opacity" Value="0" />
+  </Style>
+  <Style Selector="ScrollBar[IsExpanded=true] /template/ Rectangle#TrackRect">
+    <Setter Property="Fill" Value="Transparent" />
+    <Setter Property="Opacity" Value="0" />
+  </Style>
+  <Style Selector="ScrollBar /template/ Rectangle">
+    <Setter Property="Fill" Value="Transparent" />
+    <Setter Property="Opacity" Value="0" />
+  </Style>
+  <Style Selector="ScrollBar[IsExpanded=true] /template/ Grid#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <!-- Ползунок неактивен — приглушённый фиолетовый -->
+  <Style Selector="ScrollBar /template/ Thumb">
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+    <Setter Property="MinWidth" Value="12" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+  <Style Selector="ScrollBar /template/ Thumb Border">
+    <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+  <Style Selector="ScrollBar /template/ Thumb:pointerover Border">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+  </Style>
+  <Style Selector="ScrollBar /template/ Thumb:pressed Border">
+    <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
+  </Style>
+  <!-- Стрелки скрыты -->
+  <Style Selector="ScrollBar /template/ RepeatButton">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+</Styles>

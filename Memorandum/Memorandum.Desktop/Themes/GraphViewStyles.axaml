@@ -25,21 +25,6 @@
     <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
     <Setter Property="BorderThickness" Value="1,0,0,0" />
   </Style>
-  <Style Selector="Button.GraphToolButton">
-    <Setter Property="Width" Value="36" />
-    <Setter Property="Height" Value="36" />
-    <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
-    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="4" />
-  </Style>
-  <Style Selector="Button.GraphLinkButton">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Foreground" Value="{StaticResource GraphLinkForeground}" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="HorizontalContentAlignment" Value="Left" />
-  </Style>
   <Style Selector="TextBlock.GraphLegendTitle">
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="FontSize" Value="14" />
@@ -51,33 +36,6 @@
   <Style Selector="TextBlock.GraphLabelSecondary">
     <Setter Property="FontSize" Value="14" />
     <Setter Property="Foreground" Value="{StaticResource GraphLabelSecondary}" />
-  </Style>
-  <Style Selector="Button.PrimaryButton">
-    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
-    <Setter Property="Padding" Value="20,12" />
-    <Setter Property="CornerRadius" Value="8" />
-  </Style>
-  <Style Selector="Button.PrimaryButton:pointerover">
-    <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
-  </Style>
-  <Style Selector="Button.PrimaryButton:pressed">
-    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
-  </Style>
-  <Style Selector="Button.GraphToolButton:pointerover">
-    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
-  </Style>
-  <Style Selector="Button.GraphToolButton:pressed">
-    <Setter Property="Background" Value="{StaticResource ToolButtonPressedBrush}" />
-  </Style>
-  <Style Selector="Button.GraphLinkButton:pointerover">
-    <Setter Property="Foreground" Value="{StaticResource AccentHoverBrush}" />
-  </Style>
-  <Style Selector="Border.AppHeader">
-    <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="0,0,0,1" />
-    <Setter Property="Padding" Value="16,12" />
   </Style>
   <Style Selector="Border.SidebarPanel">
     <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
@@ -91,138 +49,12 @@
     <Setter Property="Padding" Value="12,10" />
     <Setter Property="Margin" Value="12,8,12,0" />
   </Style>
-  <Style Selector="Button.NavItem">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
-    <Setter Property="HorizontalAlignment" Value="Stretch" />
-    <Setter Property="HorizontalContentAlignment" Value="Left" />
-    <Setter Property="Padding" Value="16,12" />
-  </Style>
-  <Style Selector="Button.NavItem:pointerover">
-    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
-  </Style>
-  <Style Selector="Button.NavItem.Selected">
-    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-  </Style>
-  <Style Selector="Button.SecondaryButton">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="Padding" Value="12,8" />
-    <Setter Property="CornerRadius" Value="6" />
-  </Style>
-  <Style Selector="Button.SecondaryButton:pointerover">
-    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
-  </Style>
-  <Style Selector="Button.TitleBarButton">
-    <Setter Property="Width" Value="46" />
-    <Setter Property="Height" Value="32" />
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Padding" Value="0" />
-    <Setter Property="HorizontalContentAlignment" Value="Center" />
-    <Setter Property="VerticalContentAlignment" Value="Center" />
-  </Style>
-  <Style Selector="Button.TitleBarButton:pointerover">
-    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
-  </Style>
-  <Style Selector="Button.TitleBarButton:pressed">
-    <Setter Property="Background" Value="{StaticResource ToolButtonPressedBrush}" />
-  </Style>
-  <Style Selector="Button.TitleBarButton.CloseButton:pointerover">
-    <Setter Property="Background" Value="#b91c1c" />
-  </Style>
-  <Style Selector="Button.TitleBarButton.CloseButton:pressed">
-    <Setter Property="Background" Value="#991b1b" />
-  </Style>
-  <!-- Поля ввода в тёмной теме: один стиль как у поиска (поиск, форма заметки, настройки) -->
-  <Style Selector="TextBox.DarkInput">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-    <Setter Property="Padding" Value="12,10" />
-  </Style>
-  <!-- При фокусе сохраняем тёмный фон и светлый текст (тема Fluent иначе даёт белый фон) -->
-  <Style Selector="TextBox.DarkInput:focus">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-  </Style>
-  <Style Selector="TextBox.DarkInput:focus /template/ Border">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-  </Style>
-  <Style Selector="ComboBox.DarkInput">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-    <Setter Property="Padding" Value="12,10" />
-  </Style>
-  <!-- Выпадающий список ComboBox: общий тёмный стиль (Popup не имеет Background, стилизуем содержимое) -->
-  <Style Selector="ComboBox Popup Border">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="6" />
-  </Style>
-  <Style Selector="ComboBox ListBox">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-  </Style>
-  <Style Selector="ComboBox ListBoxItem">
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-  </Style>
-  <Style Selector="ComboBox ListBoxItem:pointerover">
-    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
-  </Style>
-  <Style Selector="ComboBox ListBoxItem:selected">
-    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
-  </Style>
-  <Style Selector="Border.AppHeader TextBox">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-    <Setter Property="Padding" Value="12,10" />
-  </Style>
-  <Style Selector="Border.AppHeader TextBox:focus">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-  </Style>
-  <Style Selector="Border.AppHeader TextBox:focus /template/ Border">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-  </Style>
-  <!-- Экран создания/редактирования заметки: карточки и поля в общей палитре -->
   <Style Selector="Border.NoteEditCard">
     <Setter Property="Background" Value="{StaticResource GraphPanelBackground}" />
     <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="8" />
     <Setter Property="Padding" Value="16" />
-  </Style>
-  <Style Selector="UserControl.NoteEditForm TextBox">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-    <Setter Property="Padding" Value="12,10" />
-  </Style>
-  <Style Selector="UserControl.NoteEditForm ComboBox">
-    <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
-    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
-    <Setter Property="Padding" Value="12,10" />
   </Style>
   <Style Selector="UserControl.NoteEditForm Border.ImageDropZone">
     <Setter Property="Background" Value="{StaticResource InputFieldBackground}" />
@@ -232,14 +64,6 @@
   </Style>
   <Style Selector="UserControl.NoteEditForm Border.ImageDropZone:pointerover">
     <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-  </Style>
-  <Style Selector="UserControl.NoteEditForm TextBlock.SectionLabel">
-    <Setter Property="Foreground" Value="{StaticResource GraphCaptionForeground}" />
-    <Setter Property="FontSize" Value="13" />
-    <Setter Property="FontWeight" Value="SemiBold" />
-  </Style>
-  <Style Selector="UserControl.NoteEditForm RadioButton, StackPanel.PresetForm RadioButton, UserControl.NoteEditForm CheckBox">
-    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
   </Style>
   <Style Selector="Border.TagSelected">
     <Setter Property="BorderBrush" Value="#ffffff" />

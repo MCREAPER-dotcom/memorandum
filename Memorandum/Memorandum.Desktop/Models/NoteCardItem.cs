@@ -1,9 +1,15 @@
+using System;
+using System.Collections.Generic;
 using Memorandum.Desktop.Themes;
 
 namespace Memorandum.Desktop.Models;
 
 public class NoteCardItem
 {
+    public Guid Id { get; }
+    public DateTime CreatedAt { get; }
+    public DateTime LastEditedAt { get; }
+
     public string Title { get; }
     /// <summary>Краткий предпросмотр для карточки (отображается в списке).</summary>
     public string Preview { get; }
@@ -12,7 +18,7 @@ public class NoteCardItem
     public string TypeLabel { get; }
     public string FolderName { get; }
     public IReadOnlyList<string> TagLabels { get; }
-    public string DateText { get; }
+    public string DateText => LastEditedAt.ToString("dd.MM.yyyy");
     public bool IsSticker { get; }
     public bool IsNormal => !IsSticker;
     public int? DurationMinutes { get; }
@@ -39,7 +45,6 @@ public class NoteCardItem
         string typeLabel,
         string folderName,
         IReadOnlyList<string> tagLabels,
-        string dateText,
         bool isSticker,
         Action onEdit,
         Action onOpenSticker,
@@ -51,15 +56,21 @@ public class NoteCardItem
         bool isClickThrough = false,
         bool isPinned = true,
         bool closeOnTimerEnd = false,
-        DateTime? deadline = null)
+        DateTime? deadline = null,
+        Guid? id = null,
+        DateTime? createdAt = null,
+        DateTime? lastEditedAt = null)
     {
+        Id = id ?? Guid.NewGuid();
+        var now = DateTime.UtcNow;
+        CreatedAt = createdAt ?? now;
+        LastEditedAt = lastEditedAt ?? now;
         Title = title;
         Preview = preview;
         Content = content ?? preview;
         TypeLabel = typeLabel;
         FolderName = folderName;
-        TagLabels = tagLabels;
-        DateText = dateText;
+        TagLabels = tagLabels ?? Array.Empty<string>();
         IsSticker = isSticker;
         DurationMinutes = durationMinutes;
         BackgroundColorHex = NormalizeHex(backgroundColorHex) ?? PaletteConstants.DefaultStickerBackgroundHex;
@@ -78,6 +89,64 @@ public class NoteCardItem
     public void OpenSticker(object _) => _onOpenSticker();
     public void StartTimer(object _) => _onStartTimer();
     public void PauseTimer(object _) => _onPauseTimer();
+
+    public NoteStorageDto ToStorageDto()
+    {
+        return new NoteStorageDto
+        {
+            Id = Id,
+            CreatedAt = CreatedAt,
+            LastEditedAt = LastEditedAt,
+            Title = Title,
+            Preview = Preview,
+            Content = Content,
+            TypeLabel = TypeLabel,
+            FolderName = FolderName,
+            TagLabels = TagLabels is List<string> list ? list : new List<string>(TagLabels),
+            IsSticker = IsSticker,
+            DurationMinutes = DurationMinutes,
+            BackgroundColorHex = BackgroundColorHex,
+            TransparencyPercent = TransparencyPercent,
+            IsClickThrough = IsClickThrough,
+            IsPinned = IsPinned,
+            CloseOnTimerEnd = CloseOnTimerEnd,
+            Deadline = Deadline
+        };
+    }
+
+    /// <summary>
+    /// Создаёт NoteCardItem из DTO; колбэки задаются снаружи (при загрузке списка).
+    /// </summary>
+    public static NoteCardItem FromStorageDto(
+        NoteStorageDto dto,
+        Action onEdit,
+        Action onOpenSticker,
+        Action? onStartTimer = null,
+        Action? onPauseTimer = null)
+    {
+        return new NoteCardItem(
+            dto.Title,
+            dto.Preview,
+            dto.Content,
+            dto.TypeLabel,
+            dto.FolderName ?? "",
+            dto.TagLabels ?? new List<string>(),
+            dto.IsSticker,
+            onEdit,
+            onOpenSticker,
+            dto.DurationMinutes,
+            onStartTimer,
+            onPauseTimer,
+            dto.BackgroundColorHex,
+            dto.TransparencyPercent,
+            dto.IsClickThrough,
+            dto.IsPinned,
+            dto.CloseOnTimerEnd,
+            dto.Deadline,
+            dto.Id,
+            dto.CreatedAt,
+            dto.LastEditedAt);
+    }
 
     private static string? NormalizeHex(string? hex)
     {

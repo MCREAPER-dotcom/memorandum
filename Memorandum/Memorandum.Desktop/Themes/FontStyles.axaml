@@ -1,0 +1,8 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:doc="using:Avalonia.Controls.Documents">
+  <!-- Шрифт Roboto для всего приложения -->
+  <Style Selector="Control">
+    <Setter Property="(doc:TextElement.FontFamily)" Value="Roboto, Segoe UI, sans-serif" />
+  </Style>
+</Styles>

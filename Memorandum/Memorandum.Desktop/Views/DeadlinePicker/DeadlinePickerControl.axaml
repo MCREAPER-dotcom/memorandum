@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Memorandum.Desktop.Views.DeadlinePickerControl"
+             HorizontalAlignment="Left"
+             ClipToBounds="False">
+  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto" Margin="0,4">
+    <Calendar x:Name="PartCalendar" Grid.Column="0" Classes="DeadlineCalendar" SelectionMode="SingleDate" DisplayMode="Month" Margin="0,0,12,0" VerticalAlignment="Top" />
+    <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="12" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+      <TimePicker x:Name="PartTimePicker" Classes="DeadlinePicker" ClockIdentifier="24HourClock" MinWidth="140" HorizontalAlignment="Stretch" />
+      <Button x:Name="ClearButton" Content="Без дедлайна" Classes="SecondaryButton" Click="OnClearClick" MinHeight="52" Padding="20,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+    </StackPanel>
+  </Grid>
+</UserControl>

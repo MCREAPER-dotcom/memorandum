@@ -8,6 +8,7 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://Memorandum.Desktop/Themes/AppResources.axaml" />
+        <ResourceInclude Source="avares://Memorandum.Desktop/Views/TextStyles/StaticTextResources.axaml" />
       </ResourceDictionary.MergedDictionaries>
       <converters:TagNameToBrushConverter x:Key="TagNameToBrushConverter" />
       <converters:BoolToBorderBrushConverter x:Key="BoolToBorderBrushConverter" />
@@ -47,6 +48,16 @@
   </Application.DataTemplates>
   <Application.Styles>
     <FluentTheme />
+    <StyleInclude Source="avares://Memorandum.Desktop/Themes/FontStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/WindowFrame/WindowFrameStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/TextStyles/StaticTextStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/DeadlineStyles/DeadlineStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/SliderStyles/SliderStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/ScrollBarStyles/ScrollBarStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/SearchStyles/SearchStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/ButtonStyles/ButtonStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Views/InputStyles/InputStyles.axaml" />
+    <StyleInclude Source="avares://Memorandum.Desktop/Controls/ScrollableContentArea.axaml" />
     <StyleInclude Source="avares://Memorandum.Desktop/Themes/GraphViewStyles.axaml" />
   </Application.Styles>
 </Application>

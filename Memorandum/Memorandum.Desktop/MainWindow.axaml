@@ -31,7 +31,8 @@
           </StackPanel>
         </Grid>
       </Border>
-    <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*" x:Name="MainContentGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+      <Border x:Name="ModalOverlay" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="#33000000" IsHitTestVisible="True" IsVisible="False" ZIndex="1000" />
       <Border Grid.Column="0" Classes="SidebarPanel">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled">
           <StackPanel x:Name="SidebarStack" Spacing="0">
@@ -71,7 +72,9 @@
           </StackPanel>
         </ScrollViewer>
       </Border>
-      <ContentControl x:Name="ContentArea" Grid.Column="1" Background="{StaticResource AppBackground}" />
+      <ContentControl x:Name="ContentArea" Grid.Column="1" Background="{StaticResource AppBackground}"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
     </Grid>
     </Grid>
   </Border>

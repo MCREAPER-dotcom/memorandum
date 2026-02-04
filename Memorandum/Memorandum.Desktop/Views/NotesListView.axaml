@@ -1,8 +1,11 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Memorandum.Desktop.Controls"
              x:Class="Memorandum.Desktop.Views.NotesListView"
-             Background="{StaticResource AppBackground}">
-  <Grid RowDefinitions="Auto,*">
+             Background="{StaticResource AppBackground}"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+  <Grid RowDefinitions="Auto,*" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <Border Grid.Row="0" Padding="24,16" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="0,0,0,1">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Grid.Column="0" Text="{Binding FoundCountText}" Foreground="{StaticResource PrimaryForeground}" FontSize="14" VerticalAlignment="Center" />
@@ -12,7 +15,7 @@
         </StackPanel>
       </Grid>
     </Border>
-    <ScrollViewer x:Name="NotesScrollViewer" Grid.Row="1" Padding="24">
+    <controls:ScrollableContentArea x:Name="ScrollArea" Grid.Row="1" Padding="24">
       <ItemsControl ItemsSource="{Binding FilteredNotes}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
@@ -81,6 +84,6 @@
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
-    </ScrollViewer>
+    </controls:ScrollableContentArea>
   </Grid>
 </UserControl>

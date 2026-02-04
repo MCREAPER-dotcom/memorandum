@@ -11,12 +11,14 @@ public sealed partial class TagItemViewModel : ObservableObject
     public string Name { get; }
     public int Count { get; }
     public ICommand SelectCommand { get; }
+    public string? ColorKey { get; }
 
-    public TagItemViewModel(string name, int count, bool isSelected, ICommand selectCommand)
+    public TagItemViewModel(string name, int count, bool isSelected, ICommand selectCommand, string? colorKey = null)
     {
         Name = name;
         Count = count;
         _isSelected = isSelected;
         SelectCommand = selectCommand;
+        ColorKey = colorKey;
     }
 }

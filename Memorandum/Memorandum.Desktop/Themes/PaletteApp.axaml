@@ -18,4 +18,7 @@
   <SolidColorBrush x:Key="AccentPressedBrush" Color="#5b21b6" />
   <SolidColorBrush x:Key="ToolButtonHoverBrush" Color="#374151" />
   <SolidColorBrush x:Key="ToolButtonPressedBrush" Color="#4b5563" />
+  <SolidColorBrush x:Key="GoldBrush" Color="#FFD700" />
+  <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="#2d1b4e" />
+  <SolidColorBrush x:Key="ListBoxItemSelectedBrush" Color="#a78bfa" />
 </ResourceDictionary>

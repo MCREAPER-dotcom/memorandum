@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Переопределение ресурсов Fluent для скроллбара: прозрачный трек, наши цвета ползунка -->
+  <SolidColorBrush x:Key="ScrollBarBackground" Color="#00000000" />
+  <SolidColorBrush x:Key="ScrollBarTrackFill" Color="#00000000" />
+  <SolidColorBrush x:Key="ScrollBarTrackStroke" Color="#00000000" />
+  <SolidColorBrush x:Key="ScrollBarTrackFillPointerOver" Color="#00000000" />
+  <SolidColorBrush x:Key="ScrollBarTrackStrokePointerOver" Color="#00000000" />
+  <SolidColorBrush x:Key="ScrollBarBackgroundPointerOver" Color="#00000000" />
+  <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#2d1b4e" />
+  <SolidColorBrush x:Key="ScrollBarThumbBackgroundColor" Color="#2d1b4e" />
+  <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#7c3aed" />
+  <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#a78bfa" />
+  <SolidColorBrush x:Key="ScrollBarThumbFillDisabled" Color="#2d1b4e" />
+  <!-- Выбранный пункт ListBoxItem — ярко-фиолетовый (Fluent использует эти ключи в шаблоне) -->
+  <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#a78bfa" />
+  <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#a78bfa" />
+  <SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#a78bfa" />
+  <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#5b21b6" />
+  <SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="#7c3aed" />
+</ResourceDictionary>

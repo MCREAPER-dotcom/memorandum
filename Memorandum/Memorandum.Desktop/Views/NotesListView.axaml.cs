@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Memorandum.Desktop.Controls;
 
 namespace Memorandum.Desktop.Views;
 
@@ -13,6 +14,6 @@ public partial class NotesListView : UserControl
 
     public void ScrollToTop()
     {
-        NotesScrollViewer.ScrollToHome();
+        ScrollArea.ScrollToHome();
     }
 }

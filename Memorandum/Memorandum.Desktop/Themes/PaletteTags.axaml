@@ -19,4 +19,19 @@
   <SolidColorBrush x:Key="TagPillRed" Color="#b91c1c" />
   <SolidColorBrush x:Key="TagPillCyan" Color="#0e7490" />
   <SolidColorBrush x:Key="TagPillYellow" Color="#a16207" />
+  <SolidColorBrush x:Key="TagPillOrange" Color="#c2410c" />
+  <SolidColorBrush x:Key="TagPillPink" Color="#be185d" />
+  <SolidColorBrush x:Key="TagPillBlue" Color="#1d4ed8" />
+  <SolidColorBrush x:Key="TagPillIndigo" Color="#4338ca" />
+  <SolidColorBrush x:Key="TagPillTeal" Color="#0d9488" />
+  <SolidColorBrush x:Key="TagPillLime" Color="#65a30d" />
+  <SolidColorBrush x:Key="TagPillAmber" Color="#d97706" />
+  <SolidColorBrush x:Key="TagPillRose" Color="#e11d48" />
+  <SolidColorBrush x:Key="TagPillSky" Color="#0284c7" />
+  <SolidColorBrush x:Key="TagPillViolet" Color="#6d28d9" />
+  <SolidColorBrush x:Key="TagPillFuchsia" Color="#a21caf" />
+  <SolidColorBrush x:Key="TagPillEmerald" Color="#047857" />
+  <SolidColorBrush x:Key="TagPillSlate" Color="#475569" />
+  <SolidColorBrush x:Key="TagPillCoral" Color="#ea580c" />
+  <SolidColorBrush x:Key="TagPillMint" Color="#10b981" />
 </ResourceDictionary>

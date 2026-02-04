@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -52,7 +53,10 @@ public partial class NoteEditView : UserControl
 
     public System.Action<string, string, string, string?, IReadOnlyList<string>, bool, NoteCardItem?, int?, string?, int, bool, bool, bool, DateTime?>? OnSaveRequested { get; set; }
     public System.Action<NoteCardItem>? OnDeleteRequested { get; set; }
-    public System.Action<string>? OnTagCreated { get; set; }
+    public System.Action<string, string?>? OnTagCreated { get; set; }
+    public Func<System.Threading.Tasks.Task>? OnAddFolderRequested { get; set; }
+    public Func<string, System.Threading.Tasks.Task>? OnAddSubfolderRequested { get; set; }
+    public Func<string, Task<TagCreationResult?>>? ShowTagDialogAsync { get; set; }
 
     public void SetFolders(IReadOnlyList<FolderRowForEdit> folders)
     {
@@ -61,7 +65,7 @@ public partial class NoteEditView : UserControl
         foreach (var row in _folderRows)
         {
             var path = row.Path;
-            var btn = new Button
+            var folderBtn = new Button
             {
                 Content = $"{row.DisplayName} ({row.Count})",
                 Tag = path,
@@ -70,17 +74,46 @@ public partial class NoteEditView : UserControl
                 Margin = new Thickness(row.Depth * 14, 0, 0, 0),
                 Padding = new Thickness(10, 6)
             };
-            btn.Click += (_, _) =>
+            if (Avalonia.Application.Current?.Resources?.TryGetResource("PrimaryForeground", null, out var fgBrush) == true && fgBrush is IBrush fb)
+                folderBtn.Foreground = fb;
+            folderBtn.Click += (_, _) =>
             {
                 _selectedFolderPath = path;
                 ApplyFolderSelection();
             };
-            FolderPanel.Children.Add(btn);
+            var rowPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };
+            rowPanel.Children.Add(folderBtn);
+            if (OnAddSubfolderRequested != null)
+            {
+                var plusBtn = new Button
+                {
+                    Content = "+",
+                    Tag = path,
+                    Padding = new Thickness(4),
+                    Background = Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    FontSize = 14
+                };
+                if (Avalonia.Application.Current?.Resources?.TryGetResource("PrimaryForeground", null, out var fg) == true && fg is IBrush brush)
+                    plusBtn.Foreground = brush;
+                plusBtn.Click += async (_, _) =>
+                {
+                    if (plusBtn.Tag is string parentPath)
+                        await (OnAddSubfolderRequested?.Invoke(parentPath) ?? System.Threading.Tasks.Task.CompletedTask).ConfigureAwait(true);
+                };
+                rowPanel.Children.Add(plusBtn);
+            }
+            FolderPanel.Children.Add(rowPanel);
         }
         ApplyFolderSelection();
     }
 
-    public void SetAvailableTags(IReadOnlyList<string> tagNames)
+    private async void OnAddFolderClick(object? sender, RoutedEventArgs e)
+    {
+        await (OnAddFolderRequested?.Invoke() ?? System.Threading.Tasks.Task.CompletedTask).ConfigureAwait(true);
+    }
+
+    public void SetAvailableTags(IReadOnlyList<string> tagNames, IReadOnlyDictionary<string, string>? colorKeysByTag = null)
     {
         _availableTags.Clear();
         if (tagNames != null)
@@ -89,9 +122,12 @@ public partial class NoteEditView : UserControl
         {
             var name = _availableTags[i];
             if (_tagColors.ContainsKey(name)) continue;
-            _tagColors[name] = PaletteConstants.DefaultTagNameToKey.TryGetValue(name, out var k)
-                ? k
-                : PaletteConstants.TagPillResourceKeys[i % PaletteConstants.TagPillResourceKeys.Length];
+            if (colorKeysByTag != null && colorKeysByTag.TryGetValue(name, out var storedKey) && !string.IsNullOrEmpty(storedKey))
+                _tagColors[name] = storedKey;
+            else if (PaletteConstants.DefaultTagNameToKey.TryGetValue(name, out var k))
+                _tagColors[name] = k;
+            else
+                _tagColors[name] = PaletteConstants.TagPillResourceKeys[Math.Abs(name.GetHashCode()) % PaletteConstants.TagPillResourceKeys.Length];
         }
         BuildTagsPanel();
     }
@@ -100,7 +136,7 @@ public partial class NoteEditView : UserControl
     {
         foreach (var child in FolderPanel.Children)
         {
-            if (child is Button b && b.Tag is string path)
+            if (child is StackPanel row && row.Children.Count > 0 && row.Children[0] is Button b && b.Tag is string path)
             {
                 if (string.Equals(path, _selectedFolderPath, StringComparison.OrdinalIgnoreCase))
                     b.Classes.Add("Selected");
@@ -134,7 +170,7 @@ public partial class NoteEditView : UserControl
             StickerClickThroughCheck.IsChecked = note.IsClickThrough;
             StickerPinnedCheck.IsChecked = note.IsPinned;
             StickerCloseOnTimerCheck.IsChecked = note.CloseOnTimerEnd;
-            DeadlineBox.Text = note.Deadline.HasValue ? note.Deadline.Value.ToString("dd.MM.yyyy HH:mm") : "";
+            DeadlinePickerControl.SetDeadline(note.Deadline);
         }
         else
         {
@@ -151,8 +187,7 @@ public partial class NoteEditView : UserControl
             StickerTransparencyBox.Text = "100";
             StickerClickThroughCheck.IsChecked = false;
             StickerPinnedCheck.IsChecked = true;
-            StickerCloseOnTimerCheck.IsChecked = false;
-            DeadlineBox.Text = "";
+            DeadlinePickerControl.SetDeadline(null);
             if (preset != null)
             {
                 TypeSticker.IsChecked = preset.IsSticker;
@@ -267,7 +302,7 @@ public partial class NoteEditView : UserControl
         var isClickThrough = StickerClickThroughCheck.IsChecked == true;
         var isPinned = StickerPinnedCheck.IsChecked == true;
         var closeOnTimer = StickerCloseOnTimerCheck.IsChecked == true;
-        DateTime? deadline = TryParseDeadline(DeadlineBox.Text);
+        DateTime? deadline = DeadlinePickerControl.GetDeadline();
         OnSaveRequested?.Invoke(title, description, content, folder, tags, isSticker, _editingNote, durationMinutes, bgHex, transparency, isClickThrough, isPinned, closeOnTimer, deadline);
     }
 
@@ -276,18 +311,6 @@ public partial class NoteEditView : UserControl
         if (_editingNote != null)
             OnDeleteRequested?.Invoke(_editingNote);
         OnBack?.Invoke();
-    }
-
-    private static DateTime? TryParseDeadline(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return null;
-        var s = text.Trim();
-        if (DateTime.TryParseExact(s, new[] { "dd.MM.yyyy HH:mm", "dd.MM.yyyy H:mm", "d.M.yyyy HH:mm", "d.M.yyyy H:mm", "dd.MM.yyyy", "d.M.yyyy" },
-                System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var dt))
-            return dt;
-        if (DateTime.TryParse(s, System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out dt))
-            return dt;
-        return null;
     }
 
     private void OnAddLinkClick(object? sender, RoutedEventArgs e) { }
@@ -395,10 +418,18 @@ public partial class NoteEditView : UserControl
 
     private async void OnCreateTagClick(object? sender, RoutedEventArgs e)
     {
-        var owner = TopLevel.GetTopLevel(this) as Window;
-        if (owner == null) return;
-        var dlg = new TagNameDialog { Title = "Новый тег" };
-        var result = await dlg.ShowDialog<TagCreationResult?>(owner);
+        TagCreationResult? result;
+        if (ShowTagDialogAsync != null)
+        {
+            result = await ShowTagDialogAsync("Новый тег");
+        }
+        else
+        {
+            var owner = TopLevel.GetTopLevel(this) as Window;
+            if (owner == null) return;
+            var dlg = new TagNameDialog { Title = "Новый тег" };
+            result = await dlg.ShowDialog<TagCreationResult?>(owner);
+        }
         if (result == null || string.IsNullOrWhiteSpace(result.Name))
             return;
         var name = result.Name.Trim();
@@ -407,6 +438,6 @@ public partial class NoteEditView : UserControl
         _availableTags.Add(name);
         _tagColors[name] = result.ColorKey;
         BuildTagsPanel();
-        OnTagCreated?.Invoke(name);
+        OnTagCreated?.Invoke(name, result.ColorKey);
     }
 }

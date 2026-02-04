@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Memorandum.Desktop.Models;
 using Memorandum.Desktop.Themes;
 
@@ -30,6 +32,8 @@ public partial class GraphCanvas : UserControl
     private GraphNode? _draggedNode;
     private double _nodeDragOffsetX;
     private double _nodeDragOffsetY;
+    private DispatcherTimer? _elasticTimer;
+    private readonly List<(GraphNode node, double startX, double startY, double endX, double endY)> _elasticAnimations = new();
 
     static GraphCanvas()
     {
@@ -127,10 +131,153 @@ public partial class GraphCanvas : UserControl
         base.OnPointerReleased(e);
         if (_draggedNode != null)
         {
+            StartElasticReturn(_draggedNode);
             e.Pointer.Capture(null);
             _draggedNode = null;
         }
         _isDragging = false;
+    }
+
+    private void StartElasticReturn(GraphNode dragged)
+    {
+        var nodes = Nodes;
+        var edges = Edges;
+        if (nodes == null || edges == null) return;
+
+        var step = GraphPaintOptions.GridStep;
+        var connected = GetConnectedNodes(dragged, edges, nodes);
+        if (connected.Count == 0)
+        {
+            dragged.X = SnapToGrid(dragged.X);
+            dragged.Y = SnapToGrid(dragged.Y);
+            InvalidateVisual();
+            return;
+        }
+
+        GraphNode? head = null;
+        foreach (var (other, edgeType) in connected)
+        {
+            if (edgeType == GraphEdgeType.InFolder)
+            {
+                head = other;
+                break;
+            }
+        }
+        head ??= connected[0].node;
+
+        var dx = dragged.X - head.X;
+        var dy = dragged.Y - head.Y;
+        var len = Math.Sqrt(dx * dx + dy * dy);
+        if (len < 1e-6) len = 1;
+        var ux = dx / len;
+        var uy = dy / len;
+        var targetX = head.X + ux * step;
+        var targetY = head.Y + uy * step;
+
+        _elasticAnimations.Clear();
+        var newPositions = new Dictionary<string, (double x, double y)>();
+        _elasticAnimations.Add((dragged, dragged.X, dragged.Y, targetX, targetY));
+        newPositions[dragged.Id] = (targetX, targetY);
+
+        var followers = new List<GraphNode>();
+        foreach (var (other, _) in connected)
+        {
+            if (other != head)
+                followers.Add(other);
+        }
+        var queue = new Queue<(GraphNode node, double parentX, double parentY)>();
+        if (followers.Count > 0)
+        {
+            var k = followers.Count;
+            var headAngle = Math.Atan2(head.Y - targetY, head.X - targetX);
+            var theta0 = headAngle - Math.PI / k;
+            for (var i = 0; i < k; i++)
+            {
+                var angle = theta0 + 2.0 * Math.PI * i / k;
+                var newX = targetX + step * Math.Cos(angle);
+                var newY = targetY + step * Math.Sin(angle);
+                var other = followers[i];
+                _elasticAnimations.Add((other, other.X, other.Y, newX, newY));
+                newPositions[other.Id] = (newX, newY);
+                queue.Enqueue((other, targetX, targetY));
+            }
+        }
+
+        while (queue.Count > 0)
+        {
+            var (current, parentX, parentY) = queue.Dequeue();
+            var (curX, curY) = newPositions[current.Id];
+            var neighbors = GetConnectedNodes(current, edges, nodes);
+            var unvisited = new List<GraphNode>();
+            foreach (var (nb, _) in neighbors)
+            {
+                if (!newPositions.ContainsKey(nb.Id))
+                    unvisited.Add(nb);
+            }
+            if (unvisited.Count == 0) continue;
+            var parentAngle = Math.Atan2(curY - parentY, curX - parentX);
+            var theta0 = parentAngle - Math.PI / unvisited.Count;
+            for (var i = 0; i < unvisited.Count; i++)
+            {
+                var angle = theta0 + 2.0 * Math.PI * i / unvisited.Count;
+                var newX = curX + step * Math.Cos(angle);
+                var newY = curY + step * Math.Sin(angle);
+                var nb = unvisited[i];
+                _elasticAnimations.Add((nb, nb.X, nb.Y, newX, newY));
+                newPositions[nb.Id] = (newX, newY);
+                queue.Enqueue((nb, curX, curY));
+            }
+        }
+
+        _elasticTimer?.Stop();
+        var start = DateTime.UtcNow;
+        const double durationMs = 220;
+        _elasticTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        _elasticTimer.Tick += (_, _) =>
+        {
+            var elapsed = (DateTime.UtcNow - start).TotalMilliseconds;
+            var t = Math.Min(1.0, elapsed / durationMs);
+            t = EaseOutCubic(t);
+            foreach (var (node, sx, sy, ex, ey) in _elasticAnimations)
+            {
+                node.X = sx + (ex - sx) * t;
+                node.Y = sy + (ey - sy) * t;
+            }
+            InvalidateVisual();
+            if (t >= 1.0)
+            {
+                _elasticTimer?.Stop();
+                _elasticTimer = null;
+                foreach (var (node, _, _, ex, ey) in _elasticAnimations)
+                {
+                    node.X = ex;
+                    node.Y = ey;
+                }
+            }
+        };
+        _elasticTimer.Start();
+    }
+
+    private static double EaseOutCubic(double t) => 1 - Math.Pow(1 - t, 3);
+
+    private static List<(GraphNode node, GraphEdgeType type)> GetConnectedNodes(GraphNode node, IReadOnlyList<GraphEdge> edges, IReadOnlyList<GraphNode> nodes)
+    {
+        var list = new List<(GraphNode, GraphEdgeType)>();
+        foreach (var edge in edges)
+        {
+            if (edge.From != node.Id && edge.To != node.Id) continue;
+            var otherId = edge.From == node.Id ? edge.To : edge.From;
+            var other = FindNode(nodes, otherId);
+            if (other != null)
+                list.Add((other, edge.Type));
+        }
+        return list;
+    }
+
+    private static double SnapToGrid(double value)
+    {
+        var step = GraphPaintOptions.GridStep;
+        return Math.Round(value / step, MidpointRounding.AwayFromZero) * step;
     }
 
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)

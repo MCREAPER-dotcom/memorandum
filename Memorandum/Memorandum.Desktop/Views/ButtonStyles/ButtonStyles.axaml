@@ -1,0 +1,89 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="Button.GraphToolButton">
+    <Setter Property="Width" Value="36" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="4" />
+  </Style>
+  <Style Selector="Button.GraphToolButton:pointerover">
+    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
+  </Style>
+  <Style Selector="Button.GraphToolButton:pressed">
+    <Setter Property="Background" Value="{StaticResource ToolButtonPressedBrush}" />
+  </Style>
+  <Style Selector="Button.GraphLinkButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource GraphLinkForeground}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+  </Style>
+  <Style Selector="Button.GraphLinkButton:pointerover">
+    <Setter Property="Foreground" Value="{StaticResource AccentHoverBrush}" />
+  </Style>
+  <Style Selector="Button.PrimaryButton">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="Padding" Value="20,12" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+  <Style Selector="Button.PrimaryButton:pointerover">
+    <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
+  </Style>
+  <Style Selector="Button.PrimaryButton:pressed">
+    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
+  </Style>
+  <Style Selector="Button.NavItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Padding" Value="16,12" />
+  </Style>
+  <Style Selector="Button.NavItem:pointerover">
+    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
+  </Style>
+  <Style Selector="Button.NavItem.Selected">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+  </Style>
+  <Style Selector="Button.SecondaryButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="12,8" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.SecondaryButton:pointerover">
+    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
+  </Style>
+  <Style Selector="Button.TitleBarButton">
+    <Setter Property="Width" Value="46" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.TitleBarButton:pointerover">
+    <Setter Property="Background" Value="{StaticResource ToolButtonHoverBrush}" />
+  </Style>
+  <Style Selector="Button.TitleBarButton:pressed">
+    <Setter Property="Background" Value="{StaticResource ToolButtonPressedBrush}" />
+  </Style>
+  <Style Selector="Button.TitleBarButton.CloseButton:pointerover">
+    <Setter Property="Background" Value="#b91c1c" />
+  </Style>
+  <Style Selector="Button.TitleBarButton.CloseButton:pressed">
+    <Setter Property="Background" Value="#991b1b" />
+  </Style>
+</Styles>

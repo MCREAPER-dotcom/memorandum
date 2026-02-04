@@ -5,6 +5,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Memorandum.Desktop.Models;
+using Memorandum.Desktop.Services;
 
 namespace Memorandum.Desktop.ViewModels;
 
@@ -34,8 +35,11 @@ public sealed partial class NotesListViewModel : ViewModelBase
     public Action<NoteCardItem>? OnStartTimerRequested { get; set; }
     public Action<NoteCardItem>? OnPauseTimerRequested { get; set; }
 
-    public NotesListViewModel()
+    private readonly INotesPersistenceService _persistence;
+
+    public NotesListViewModel(INotesPersistenceService persistence)
     {
+        _persistence = persistence;
         LoadNotes();
     }
 
@@ -76,6 +80,7 @@ public sealed partial class NotesListViewModel : ViewModelBase
     {
         _allNotes.Insert(0, item);
         ApplyFilter();
+        SaveNotes();
     }
 
     public void ReplaceNote(NoteCardItem oldItem, NoteCardItem newItem)
@@ -85,6 +90,7 @@ public sealed partial class NotesListViewModel : ViewModelBase
         {
             _allNotes[idx] = newItem;
             ApplyFilter();
+            SaveNotes();
         }
     }
 
@@ -95,32 +101,30 @@ public sealed partial class NotesListViewModel : ViewModelBase
         {
             _allNotes.RemoveAt(idx);
             ApplyFilter();
+            SaveNotes();
         }
     }
 
     private void LoadNotes()
     {
         _allNotes.Clear();
-        var data = new[]
-        {
-            ("Идеи для проекта", "Использовать новый фреймворк для UI...", "Обычная", "Работа", new[] { "идеи", "разработка" }, "17.01.2024", false),
-            ("Купить продукты", "Молоко, хлеб, яйца, фрукты...", "Стикер", "Личное", new[] { "покупки" }, "16.01.2024", true),
-            ("Встреча с командой", "Обсудить план проекта на следующую неделю...", "Обычная", "Работа", new[] { "важное", "встреча" }, "15.01.2024", false)
-        };
-        foreach (var (title, preview, typeLabel, folderName, tagLabels, dateText, isSticker) in data)
+        var dtos = _persistence.Load();
+        foreach (var dto in dtos)
         {
             NoteCardItem? item = null;
-            item = new NoteCardItem(
-                title, preview, preview, typeLabel, folderName, tagLabels, dateText, isSticker,
+            item = NoteCardItem.FromStorageDto(dto,
                 () => OnEditRequested?.Invoke(item!),
                 () => OnOpenStickerRequested?.Invoke(item!),
-                null,
                 () => OnStartTimerRequested?.Invoke(item!),
-                () => OnPauseTimerRequested?.Invoke(item!),
-                null, 100, false, true, false, null);
+                () => OnPauseTimerRequested?.Invoke(item!));
             _allNotes.Add(item);
         }
         ApplyFilter();
+    }
+
+    private void SaveNotes()
+    {
+        _persistence.Save(_allNotes);
     }
 
     private void ApplyFilter(NoteCardItem? highlightNote = null)

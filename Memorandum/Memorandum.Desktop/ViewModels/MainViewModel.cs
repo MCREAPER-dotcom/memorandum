@@ -28,6 +28,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private readonly List<string> _folderPaths = new(MainViewModelConstants.SidebarFolderNames);
     private readonly List<string> _knownTagNames = new();
+    private readonly Dictionary<string, string> _tagColorKeys = new(StringComparer.OrdinalIgnoreCase);
     private readonly NotesGraphDataProvider _graphDataProvider;
 
     private string? _selectedFolder;
@@ -42,7 +43,8 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        NotesList = new NotesListViewModel();
+        var notesPersistence = new NotesPersistenceService();
+        NotesList = new NotesListViewModel(notesPersistence);
         _graphDataProvider = new NotesGraphDataProvider(() => NotesList.GetAllNotes());
 
         NotesList.OnEditRequested = note => ShowNoteEditRequested?.Invoke(note);
@@ -131,13 +133,43 @@ public sealed partial class MainViewModel : ViewModelBase
         }
     }
 
-    public void AddKnownTag(string name)
+    public void AddSubfolderWithName(string parentPath, string name)
     {
         var trimmed = (name ?? "").Trim();
         if (string.IsNullOrEmpty(trimmed)) return;
-        if (_knownTagNames.Contains(trimmed, StringComparer.OrdinalIgnoreCase)) return;
+        var newPath = string.IsNullOrEmpty(parentPath) ? trimmed : parentPath + "/" + trimmed;
+        if (!_folderPaths.Contains(newPath, StringComparer.OrdinalIgnoreCase))
+        {
+            _folderPaths.Add(newPath);
+            RefreshSidebarRequested?.Invoke();
+        }
+    }
+
+    public void AddKnownTag(string name, string? colorKey = null)
+    {
+        var trimmed = (name ?? "").Trim();
+        if (string.IsNullOrEmpty(trimmed)) return;
+        if (_knownTagNames.Contains(trimmed, StringComparer.OrdinalIgnoreCase))
+        {
+            if (!string.IsNullOrEmpty(colorKey))
+                _tagColorKeys[trimmed] = colorKey;
+            RefreshSidebarRequested?.Invoke();
+            return;
+        }
         _knownTagNames.Add(trimmed);
+        if (!string.IsNullOrEmpty(colorKey))
+            _tagColorKeys[trimmed] = colorKey;
         RefreshSidebarRequested?.Invoke();
+    }
+
+    public string? GetTagColorKey(string tagName)
+    {
+        return _tagColorKeys.TryGetValue(tagName ?? "", out var key) ? key : null;
+    }
+
+    public IReadOnlyDictionary<string, string> GetTagColorKeys()
+    {
+        return new Dictionary<string, string>(_tagColorKeys);
     }
 
     public IReadOnlyList<string> GetFolderPaths() => _folderPaths;
@@ -211,7 +243,8 @@ public sealed partial class MainViewModel : ViewModelBase
             var count = counts.GetValueOrDefault(name, 0);
             var isSelected = string.Equals(name, _selectedTag, StringComparison.OrdinalIgnoreCase);
             var nameCopy = name;
-            TagItems.Add(new TagItemViewModel(name, count, isSelected, new RelayCommand(() => SelectTag(nameCopy))));
+            var colorKey = _tagColorKeys.TryGetValue(name, out var ck) ? ck : null;
+            TagItems.Add(new TagItemViewModel(name, count, isSelected, new RelayCommand(() => SelectTag(nameCopy)), colorKey));
         }
     }
 
