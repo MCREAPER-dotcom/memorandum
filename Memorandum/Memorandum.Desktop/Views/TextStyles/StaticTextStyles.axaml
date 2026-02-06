@@ -1,6 +1,11 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <!-- Стили статичного текста (лейблы, подписи). Меняйте здесь размер, начертание и привязку к ресурсам цвета. -->
+  <Style Selector="TextBlock.PageTitle">
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="FontSize" Value="20" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
   <Style Selector="TextBlock.SectionLabel">
     <Setter Property="Foreground" Value="{StaticResource LabelForeground}" />
     <Setter Property="FontSize" Value="13" />
@@ -15,6 +20,14 @@
     <Setter Property="FontSize" Value="12" />
   </Style>
   <Style Selector="TextBlock.StaticLabelSecondary">
+    <Setter Property="Foreground" Value="{StaticResource LabelSecondaryForeground}" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+  <Style Selector="TextBlock.CardLabel">
+    <Setter Property="Foreground" Value="{StaticResource LabelSecondaryForeground}" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+  <Style Selector="TextBlock.PlaceholderLabel">
     <Setter Property="Foreground" Value="{StaticResource LabelSecondaryForeground}" />
     <Setter Property="FontSize" Value="14" />
   </Style>

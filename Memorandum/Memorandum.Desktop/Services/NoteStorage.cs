@@ -37,7 +37,13 @@ public static class NoteStorage
         {
             var json = File.ReadAllText(path);
             var list = JsonSerializer.Deserialize<List<NoteStorageDto>>(json, JsonOptions);
-            return list ?? new List<NoteStorageDto>();
+            if (list == null) return new List<NoteStorageDto>();
+            foreach (var dto in list)
+            {
+                dto.Content = NoteAttachmentsHelper.ResolveContentPaths(dto.Content);
+                dto.Preview = NoteAttachmentsHelper.ResolveContentPaths(dto.Preview);
+            }
+            return list;
         }
         catch
         {
@@ -49,6 +55,11 @@ public static class NoteStorage
     {
         var path = GetNotesPath();
         var list = new List<NoteStorageDto>(items);
+        foreach (var dto in list)
+        {
+            dto.Content = NoteAttachmentsHelper.NormalizeContentForStorage(dto.Content);
+            dto.Preview = NoteAttachmentsHelper.NormalizeContentForStorage(dto.Preview);
+        }
         var json = JsonSerializer.Serialize(list, JsonOptions);
         File.WriteAllText(path, json);
     }

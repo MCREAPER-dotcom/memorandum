@@ -1,18 +1,19 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="using:Memorandum.Desktop.Resources"
              x:Class="Memorandum.Desktop.Views.SettingsView"
              Background="{StaticResource AppBackground}">
   <Grid RowDefinitions="Auto,*">
     <Border Grid.Row="0" Classes="AppHeader">
       <Grid ColumnDefinitions="Auto,*,Auto">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <Button x:Name="BackButton" Content="Назад" Classes="SecondaryButton" Click="OnBackClick" />
-          <TextBlock Text="Настройки" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
+          <Button x:Name="BackButton" Content="{x:Static res:UiStrings.Back}" Classes="SecondaryButton" Click="OnBackClick" />
+          <TextBlock Text="{x:Static res:UiStrings.SettingsTitle}" Classes="PageTitle" VerticalAlignment="Center" />
         </StackPanel>
         <Panel Grid.Column="1" />
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <Button x:Name="CancelButton" Content="Отмена" Classes="SecondaryButton" Click="OnCancelClick" />
-          <Button x:Name="SaveButton" Content="Сохранить" Classes="PrimaryButton" Click="OnSaveClick" />
+          <Button x:Name="CancelButton" Content="{x:Static res:UiStrings.Cancel}" Classes="SecondaryButton" Click="OnCancelClick" />
+          <Button x:Name="SaveButton" Content="{x:Static res:UiStrings.Save}" Classes="PrimaryButton" Click="OnSaveClick" />
         </StackPanel>
       </Grid>
     </Border>
@@ -22,46 +23,46 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
       <StackPanel Grid.Column="0" Spacing="0" Margin="0,0,24,0">
-        <Button x:Name="ManagementTab" Content="Управление" Classes="NavItem" HorizontalAlignment="Stretch" Click="OnManagementTabClick" />
-        <Button x:Name="AdditionalTab" Content="Дополнительные настройки" Classes="NavItem" HorizontalAlignment="Stretch" Click="OnAdditionalTabClick" />
+        <Button x:Name="ManagementTab" Content="{x:Static res:UiStrings.Management}" Classes="NavItem" HorizontalAlignment="Stretch" Click="OnManagementTabClick" />
+        <Button x:Name="AdditionalTab" Content="{x:Static res:UiStrings.AdditionalSettings}" Classes="NavItem" HorizontalAlignment="Stretch" Click="OnAdditionalTabClick" />
       </StackPanel>
       <ScrollViewer Grid.Column="1">
         <StackPanel x:Name="SettingsContent" Spacing="24">
           <Border x:Name="ManagementPanel" Padding="24" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="8">
             <StackPanel Spacing="16">
-              <TextBlock Text="Глобальные горячие клавиши" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
-              <TextBlock Text="Настройте сочетания клавиш для быстрого доступа к функциям приложения" FontSize="14" Foreground="{StaticResource GraphLabelSecondary}" TextWrapping="Wrap" />
+              <TextBlock Text="{x:Static res:UiStrings.GlobalHotkeys}" Classes="SectionLabel" FontSize="18" />
+              <TextBlock Text="{x:Static res:UiStrings.GlobalHotkeysDescription}" Classes="StaticLabelSecondary" TextWrapping="Wrap" />
               <StackPanel x:Name="HotkeyRowsPanel" Spacing="12" />
               <Border x:Name="HotkeyCaptureBorder" IsVisible="False" Focusable="False" />
-              <TextBlock x:Name="HotkeyConflictWarning" IsVisible="False" Text="Это сочетание уже назначено другому действию." Foreground="#e57373" FontSize="13" />
+              <TextBlock x:Name="HotkeyConflictWarning" IsVisible="False" Text="{x:Static res:UiStrings.HotkeyConflictWarning}" Foreground="#e57373" FontSize="13" />
               <Border Padding="12" Background="#3d3520" BorderBrush="#b45309" BorderThickness="1" CornerRadius="4" Margin="0,8,0,0">
-                <TextBlock Text="Внимание: Одно сочетание клавиш может быть назначено только одному действию. При конфликте вы получите предупреждение." Foreground="{StaticResource PrimaryForeground}" TextWrapping="Wrap" FontSize="13" />
+                <TextBlock Text="{x:Static res:UiStrings.HotkeyConflictNotice}" Foreground="{StaticResource PrimaryForeground}" TextWrapping="Wrap" Classes="CardLabel" />
               </Border>
             </StackPanel>
           </Border>
           <Border x:Name="AdditionalPanel" Padding="24" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="8" IsVisible="False">
             <StackPanel Spacing="24">
-              <TextBlock Text="Настройки звука" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
+              <TextBlock Text="{x:Static res:UiStrings.SoundSettings}" Classes="SectionLabel" FontSize="16" />
               <StackPanel Spacing="8">
-                <TextBlock Text="Звук по умолчанию для уведомлений" Foreground="{StaticResource GraphLabelSecondary}" />
-                <TextBox Watermark="notification.mp3" Classes="DarkInput" />
+                <TextBlock Text="{x:Static res:UiStrings.DefaultNotificationSound}" Classes="StaticLabelSecondary" />
+                <TextBox x:Name="NotificationSoundBox" Watermark="notification.mp3" Classes="DarkInput" />
               </StackPanel>
               <StackPanel Spacing="8">
-                <TextBlock Text="Настройки отображения" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
-                <TextBlock Text="Запускать приложение при старте системы" Foreground="{StaticResource PrimaryForeground}" />
-                <TextBlock Text="Сворачивать в трей при закрытии окна" Foreground="{StaticResource PrimaryForeground}" />
-                <TextBlock Text="Анимация при открытии стикеров" Foreground="{StaticResource PrimaryForeground}" />
+                <TextBlock Text="{x:Static res:UiStrings.DisplaySettings}" Classes="SectionLabel" FontSize="16" />
+                <CheckBox x:Name="RunAtStartupCheck" Content="{x:Static res:UiStrings.RunAtStartup}" Foreground="{StaticResource PrimaryForeground}" />
+                <CheckBox x:Name="MinimizeToTrayCheck" Content="{x:Static res:UiStrings.MinimizeToTray}" Foreground="{StaticResource PrimaryForeground}" />
+                <CheckBox x:Name="StickerAnimationCheck" Content="{x:Static res:UiStrings.StickerAnimation}" Foreground="{StaticResource PrimaryForeground}" />
               </StackPanel>
               <StackPanel Spacing="8">
-                <TextBlock Text="Резервное копирование" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
-                <TextBlock Text="Путь для резервных копий" Foreground="{StaticResource GraphLabelSecondary}" />
-                <TextBox Watermark="C:\Users\User\Documents\Memorandum\Backups" Classes="DarkInput" />
+                <TextBlock Text="{x:Static res:UiStrings.Backup}" Classes="SectionLabel" FontSize="16" />
+                <TextBlock Text="{x:Static res:UiStrings.BackupPath}" Classes="StaticLabelSecondary" />
+                <TextBox x:Name="BackupPathBox" Watermark="C:\Users\User\Documents\Memorandum\Backups" Classes="DarkInput" />
               </StackPanel>
               <Border Padding="16" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="8">
                 <StackPanel Spacing="4">
-                  <TextBlock Text="О программе" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
-                  <TextBlock Text="Memorandum — приложение для заметок, стикеров и графов" Foreground="{StaticResource GraphLabelSecondary}" TextWrapping="Wrap" />
-                  <TextBlock Text="© MCREAPER" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" Margin="0,8,0,0" />
+                  <TextBlock Text="{x:Static res:UiStrings.About}" Classes="SectionLabel" FontSize="16" />
+                  <TextBlock Text="{x:Static res:UiStrings.AboutDescription}" Classes="StaticLabelSecondary" TextWrapping="Wrap" />
+                  <TextBlock Text="{x:Static res:UiStrings.AboutCopyright}" Classes="StaticLabelSecondary" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
             </StackPanel>

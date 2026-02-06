@@ -32,13 +32,16 @@ public partial class MainWindow : Window, IModalOverlayHost
     private readonly SettingsView _settingsView;
     private readonly NoteEditView _noteEditView;
     private Button? _selectedNavButton;
-    private readonly Dictionary<string, List<StickerWindow>> _openStickers = new();
+    private readonly Dictionary<Guid, List<StickerWindow>> _openStickers = new();
     private static readonly TagNameToBrushConverter TagBrushConverter = new();
     private IntPtr _mainWindowHandle;
     private readonly HashSet<string> _remindedDeadlineKeys = new();
     private DispatcherTimer? _deadlineReminderTimer;
     private TagNameDialog? _tagDialog;
     private SubfolderNameDialog? _folderDialog;
+    private PlaceholderDialog? _placeholderDialog;
+    private DeadlineReminderWindow? _deadlineReminderWindow;
+    private readonly IFolderTagCreationService _folderTagService;
 
     public MainWindow()
     {
@@ -53,8 +56,31 @@ public partial class MainWindow : Window, IModalOverlayHost
         _mainVm.ShowSubfolderDialogRequested = ShowSubfolderDialog;
         _mainVm.RefreshSidebarRequested = RefreshSidebarFromViewModel;
 
+        var folderTagHandler = new FolderTagCreationHandler(
+            title => { EnsureFolderDialog(); return _folderDialog!.ShowModalReusableAsync(this, title); },
+            title => { EnsureTagDialog(); return _tagDialog!.ShowModalReusableAsync(this, title); },
+            name => _mainVm.AddRootFolder(name),
+            (parentPath, name) => _mainVm.AddSubfolderWithName(parentPath, name),
+            (name, colorKey) => _mainVm.AddKnownTag(name, colorKey),
+            RefreshSidebarFromViewModel);
+        _folderTagService = new FolderTagCreationService(folderTagHandler);
+
         _notesListView = new NotesListView { DataContext = _mainVm.NotesList };
-        _presetsView = new PresetsView { OnBack = () => _mainVm.NavigateToNotesCommand.Execute(null), OnApplyPresetRequested = p => ShowNoteEdit(null, p) };
+        _presetsView = new PresetsView
+        {
+            OnBack = () => _mainVm.NavigateToNotesCommand.Execute(null),
+            OnApplyPresetRequested = p => ShowNoteEdit(null, p),
+            FolderTagCreationService = _folderTagService,
+            GetFoldersForPreset = () => _mainVm.GetFoldersForEdit(),
+            GetTagNamesForPreset = () => _mainVm.GetTagNamesForEdit(),
+            GetTagColorKeys = () => _mainVm.GetTagColorKeys(),
+            RefreshPresetFormRequested = () =>
+            {
+                RefreshSidebarFromViewModel();
+                _presetsView.RefreshPresetFormFolders();
+                _presetsView.RefreshPresetFormTags();
+            }
+        };
         _settingsView = new SettingsView
         {
             OnBack = () => _mainVm.NavigateToNotesCommand.Execute(null),
@@ -64,9 +90,7 @@ public partial class MainWindow : Window, IModalOverlayHost
         {
             OnBack = () => { ContentArea.Content = GetViewForPage(); SelectNavButton(AllNotesButton); },
             OnTagCreated = (name, colorKey) => { _mainVm.AddKnownTag(name, colorKey); RefreshSidebarFromViewModel(); },
-            OnAddFolderRequested = OnNoteEditAddFolder,
-            OnAddSubfolderRequested = OnNoteEditAddSubfolder,
-            ShowTagDialogAsync = ShowTagDialogAsync
+            FolderTagCreationService = _folderTagService
         };
 
         DataContext = _mainVm;
@@ -79,6 +103,9 @@ public partial class MainWindow : Window, IModalOverlayHost
         Opened += OnMainWindowOpened;
         Closed += OnMainWindowClosed;
         StartDeadlineReminderTimer();
+
+        EnsureTagDialog();
+        EnsureFolderDialog();
     }
 
     private void StartDeadlineReminderTimer()
@@ -105,9 +132,9 @@ public partial class MainWindow : Window, IModalOverlayHost
 
     private void ShowDeadlineReminder(string noteTitle, string deadlineText)
     {
-        var w = new DeadlineReminderWindow();
-        w.SetNote(noteTitle, deadlineText);
-        w.Show(this);
+        EnsureDeadlineReminderWindow();
+        _deadlineReminderWindow!.SetNote(noteTitle, deadlineText);
+        _deadlineReminderWindow.Show(this);
     }
 
     private void OnMainWindowOpened(object? sender, EventArgs e)
@@ -129,8 +156,28 @@ public partial class MainWindow : Window, IModalOverlayHost
             preloadTimer.Stop();
             EnsureTagDialog();
             EnsureFolderDialog();
+            EnsurePlaceholderDialog();
+            EnsureDeadlineReminderWindow();
+            WarmUpFolderAndTagDialogs();
         };
         preloadTimer.Start();
+    }
+
+    /// <summary>Первый Show() создаёт нативное окно и раскладку — вызываем его заранее в свёрнутом виде и скрываем.</summary>
+    private void WarmUpFolderAndTagDialogs()
+    {
+        if (_folderDialog != null)
+        {
+            _folderDialog.WindowState = WindowState.Minimized;
+            _folderDialog.Show(this);
+            _folderDialog.Hide();
+        }
+        if (_tagDialog != null)
+        {
+            _tagDialog.WindowState = WindowState.Minimized;
+            _tagDialog.Show(this);
+            _tagDialog.Hide();
+        }
     }
 
     private void OnMainWindowClosed(object? sender, EventArgs e)
@@ -258,6 +305,18 @@ public partial class MainWindow : Window, IModalOverlayHost
     {
         if (_tagDialog == null)
             _tagDialog = new TagNameDialog();
+    }
+
+    private void EnsurePlaceholderDialog()
+    {
+        if (_placeholderDialog == null)
+            _placeholderDialog = new PlaceholderDialog();
+    }
+
+    private void EnsureDeadlineReminderWindow()
+    {
+        if (_deadlineReminderWindow == null)
+            _deadlineReminderWindow = new DeadlineReminderWindow();
     }
 
     void IModalOverlayHost.SetModalOverlayVisible(bool visible)
@@ -415,28 +474,6 @@ public partial class MainWindow : Window, IModalOverlayHost
         }
     }
 
-    private async System.Threading.Tasks.Task OnNoteEditAddFolder()
-    {
-        EnsureFolderDialog();
-        var name = await _folderDialog!.ShowModalReusableAsync(this, "Добавить папку");
-        if (!string.IsNullOrWhiteSpace(name))
-        {
-            _mainVm.AddRootFolder(name!);
-            RefreshSidebarFromViewModel();
-        }
-    }
-
-    private async System.Threading.Tasks.Task OnNoteEditAddSubfolder(string parentPath)
-    {
-        EnsureFolderDialog();
-        var name = await _folderDialog!.ShowModalReusableAsync(this, "Вложенная папка");
-        if (!string.IsNullOrWhiteSpace(name))
-        {
-            _mainVm.AddSubfolderWithName(parentPath, name!);
-            RefreshSidebarFromViewModel();
-        }
-    }
-
     private async void OnAddTagClick(object? sender, RoutedEventArgs e)
     {
         var result = await ShowTagDialogAsync("Добавить тег");
@@ -449,44 +486,24 @@ public partial class MainWindow : Window, IModalOverlayHost
 
     private void OpenSticker(NoteCardItem note)
     {
-        var title = note.Title;
-        var content = note.Content;
-        var noteKey = title + "|" + content;
-        if (!_openStickers.TryGetValue(noteKey, out var list))
+        var noteId = note.Id;
+        if (!_openStickers.TryGetValue(noteId, out var list))
         {
             list = new List<StickerWindow>();
-            _openStickers[noteKey] = list;
+            _openStickers[noteId] = list;
         }
-        var sticker = new StickerWindow(title, content, note.DurationMinutes, note.BackgroundColorHex, note.TransparencyPercent, note.IsClickThrough, note.IsPinned, note.CloseOnTimerEnd, note.Deadline);
+        var sticker = new StickerWindow(note.Title, note.Content, note.Preview, note.DurationMinutes, note.BackgroundColorHex, note.TransparencyPercent, note.IsClickThrough, note.IsPinned, note.CloseOnTimerEnd, note.Deadline);
         if (Icon != null)
             sticker.Icon = Icon;
-        sticker.OnContentSaved = (newContent) =>
+        sticker.OnContentSaved = (newPreview) =>
         {
-            var newItem = CreateReplacementNoteWithContent(note, newContent);
+            var newItem = CreateReplacementNoteWithPreview(note, newPreview);
             _mainVm.NotesList.ReplaceNote(note, newItem);
-            var oldKey = note.Title + "|" + note.Content;
-            var newKey = note.Title + "|" + newContent;
-            if (_openStickers.TryGetValue(oldKey, out var oldList))
-            {
-                oldList.Remove(sticker);
-                if (oldList.Count == 0)
-                    _openStickers.Remove(oldKey);
-            }
-            if (!_openStickers.TryGetValue(newKey, out var newList))
-            {
-                newList = new List<StickerWindow>();
-                _openStickers[newKey] = newList;
-            }
-            newList.Add(sticker);
         };
         sticker.Closed += (_, _) =>
         {
-            foreach (var kv in _openStickers.ToList())
-            {
-                if (kv.Value.Remove(sticker) && kv.Value.Count == 0)
-                    _openStickers.Remove(kv.Key);
-                break;
-            }
+            if (_openStickers.TryGetValue(noteId, out var lst) && lst.Remove(sticker) && lst.Count == 0)
+                _openStickers.Remove(noteId);
         };
         list.Add(sticker);
         sticker.Show();
@@ -509,14 +526,30 @@ public partial class MainWindow : Window, IModalOverlayHost
         return newItem;
     }
 
+    private NoteCardItem CreateReplacementNoteWithPreview(NoteCardItem oldNote, string newPreview)
+    {
+        NoteCardItem? newItem = null;
+        newItem = new NoteCardItem(
+            oldNote.Title, newPreview, oldNote.Content, oldNote.TypeLabel, oldNote.FolderName, oldNote.TagLabels, oldNote.IsSticker,
+            () => ShowNoteEdit(newItem!),
+            () => OpenSticker(newItem!),
+            oldNote.DurationMinutes,
+            () => OpenSticker(newItem!),
+            () => CloseStickerForNote(newItem!),
+            oldNote.BackgroundColorHex, oldNote.TransparencyPercent, oldNote.IsClickThrough, oldNote.IsPinned, oldNote.CloseOnTimerEnd, oldNote.Deadline,
+            id: oldNote.Id,
+            createdAt: oldNote.CreatedAt,
+            lastEditedAt: DateTime.UtcNow);
+        return newItem;
+    }
+
     private void CloseStickerForNote(NoteCardItem note)
     {
-        var noteKey = note.Title + "|" + note.Content;
-        if (!_openStickers.TryGetValue(noteKey, out var list))
+        if (!_openStickers.TryGetValue(note.Id, out var list))
             return;
         foreach (var window in list.ToList())
             window.Close();
-        _openStickers.Remove(noteKey);
+        _openStickers.Remove(note.Id);
     }
 
     private void OpenNoteInInterface(string title, string content)
@@ -533,10 +566,10 @@ public partial class MainWindow : Window, IModalOverlayHost
         ShowNoteEdit(tempItem);
     }
 
-    private async System.Threading.Tasks.Task ShowPlaceholder(string title, string message)
+    private async Task ShowPlaceholder(string title, string message)
     {
-        var dlg = new PlaceholderDialog { Title = title, Message = message };
-        await dlg.ShowDialog(this);
+        EnsurePlaceholderDialog();
+        await _placeholderDialog!.ShowReusableAsync(this, title, message);
     }
 
     private void CaptureScreenToClipboardAsync()

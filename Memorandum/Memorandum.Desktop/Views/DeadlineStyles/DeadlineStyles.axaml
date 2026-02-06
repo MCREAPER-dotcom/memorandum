@@ -31,7 +31,17 @@
     <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
     <Setter Property="BorderThickness" Value="2" />
   </Style>
-  <!-- Кнопки дней внутри CalendarItem (вложенный шаблон во Fluent) -->
+  <!-- Кнопки дней внутри CalendarItem (вложенный шаблон во Fluent) — выбранный и hover в стиле палитры -->
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ CalendarDayButton:pointerover">
+    <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource AccentHoverBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ CalendarDayButton:pointerover Border">
+    <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource AccentHoverBrush}" />
+  </Style>
   <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ Button:selected">
     <Setter Property="Background" Value="{StaticResource ListBoxItemSelectedBrush}" />
     <Setter Property="Foreground" Value="{StaticResource PrimaryForeground}" />
@@ -54,12 +64,22 @@
     <Setter Property="BorderBrush" Value="{StaticResource ListBoxItemSelectedBrush}" />
     <Setter Property="BorderThickness" Value="2" />
   </Style>
-  <!-- Дни прошлого и следующего месяца — тёмно-фиолетовые плитки -->
+  <!-- Дни прошлого и следующего месяца — тёмно-фиолетовые плитки (внутри CalendarItem это CalendarDayButton:inactive) -->
   <Style Selector="Calendar.DeadlineCalendar /template/ Button:inactive">
     <Setter Property="Background" Value="#2d1b4e" />
     <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
   </Style>
   <Style Selector="Calendar.DeadlineCalendar /template/ Button:inactive Border">
+    <Setter Property="Background" Value="#2d1b4e" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ CalendarDayButton:inactive">
+    <Setter Property="Background" Value="#2d1b4e" />
+    <Setter Property="Foreground" Value="{StaticResource InputFieldForeground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Calendar.DeadlineCalendar /template/ CalendarItem /template/ CalendarDayButton:inactive Border">
     <Setter Property="Background" Value="#2d1b4e" />
     <Setter Property="BorderBrush" Value="{StaticResource GraphBorderBrush}" />
   </Style>

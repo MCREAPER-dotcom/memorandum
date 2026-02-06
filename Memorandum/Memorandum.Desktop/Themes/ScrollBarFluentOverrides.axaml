@@ -18,4 +18,20 @@
   <SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#a78bfa" />
   <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#5b21b6" />
   <SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="#7c3aed" />
+  <!-- Календарь: дни не из текущего месяца (CalendarDayButton:inactive) -->
+  <SolidColorBrush x:Key="CalendarViewOutOfScopeBackground" Color="#2d1b4e" />
+  <SolidColorBrush x:Key="CalendarViewOutOfScopeForeground" Color="#d1d5db" />
+  <!-- Календарь: плитки дней текущего месяца — видимый фон и обводка для читаемости -->
+  <SolidColorBrush x:Key="CalendarViewCalendarItemRevealBackground" Color="#252538" />
+  <SolidColorBrush x:Key="CalendarViewCalendarItemRevealBorderBrush" Color="#4a4a6a" />
+  <SolidColorBrush x:Key="CalendarViewCalendarItemForeground" Color="#f3f4f6" />
+  <!-- Hover и нажатие -->
+  <SolidColorBrush x:Key="CalendarViewHoverBorderBrush" Color="#a78bfa" />
+  <SolidColorBrush x:Key="CalendarViewPressedBorderBrush" Color="#5b21b6" />
+  <!-- Выбранный день -->
+  <SolidColorBrush x:Key="CalendarViewSelectedBorderBrush" Color="#a78bfa" />
+  <SolidColorBrush x:Key="CalendarViewSelectedHoverBorderBrush" Color="#c4b5fd" />
+  <SolidColorBrush x:Key="CalendarViewSelectedPressedBorderBrush" Color="#5b21b6" />
+  <!-- Сегодня -->
+  <SolidColorBrush x:Key="CalendarViewTodayForeground" Color="#ffffff" />
 </ResourceDictionary>

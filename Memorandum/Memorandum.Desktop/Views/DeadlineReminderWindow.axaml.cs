@@ -1,9 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Memorandum.Desktop;
 
 namespace Memorandum.Desktop.Views;
 
-public partial class DeadlineReminderWindow : Window
+public partial class DeadlineReminderWindow : MemorandumDialogWindow
 {
     public DeadlineReminderWindow()
     {

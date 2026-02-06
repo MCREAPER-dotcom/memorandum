@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <!-- Ресурсы для статичного текста (лейблы, подписи). Меняйте здесь цвет, чтобы изменить отображение во всех формах. -->
-  <SolidColorBrush x:Key="LabelForeground" Color="#f3f4f6" />
-  <SolidColorBrush x:Key="LabelSecondaryForeground" Color="#d1d5db" />
+  <SolidColorBrush x:Key="LabelForeground" Color="#ffffff" />
+  <SolidColorBrush x:Key="LabelSecondaryForeground" Color="#e5e7eb" />
 </ResourceDictionary>

@@ -1,38 +1,22 @@
-<Window xmlns="https://github.com/avaloniaui"
+<local:MemorandumDialogWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:Memorandum.Desktop"
+        xmlns:controls="using:Memorandum.Desktop.Controls"
         x:Class="Memorandum.Desktop.Views.SubfolderNameDialog"
         Title="Добавить папку"
         Width="420"
         Height="220"
         MinWidth="380"
         MinHeight="200"
-        WindowStartupLocation="CenterOwner"
-        SystemDecorations="None"
-        ExtendClientAreaToDecorationsHint="True"
-        Background="{StaticResource AppBackground}">
-  <Border BorderBrush="{StaticResource AppBackground}" BorderThickness="1">
-    <Grid RowDefinitions="Auto,*">
-      <Border x:Name="HeaderBorder" Grid.Row="0" Classes="AppHeader" Background="Transparent" Cursor="SizeAll" PointerPressed="OnTitleBarPointerPressed">
-        <Grid ColumnDefinitions="Auto,*,Auto">
-          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-            <Image x:Name="TitleBarIcon" Width="20" Height="20" IsVisible="False" />
-            <TextBlock x:Name="TitleBarTitle" Text="Добавить папку" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
-          </StackPanel>
-          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,12,0">
-            <Button Content="—" FontSize="14" Classes="TitleBarButton" Click="OnMinimizeClick" />
-            <Button Content="□" FontSize="12" Classes="TitleBarButton" Click="OnMaximizeClick" />
-            <Button Content="×" FontSize="18" Classes="TitleBarButton CloseButton" Click="OnCloseClick" />
-          </StackPanel>
-        </Grid>
-      </Border>
-      <StackPanel Grid.Row="1" Margin="24" Spacing="16">
-        <TextBlock Text="Имя папки:" Classes="StaticLabel" />
-        <TextBox x:Name="NameBox" Watermark="название папки" Classes="DarkInput" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
-          <Button Content="Отмена" Classes="SecondaryButton" Click="OnCancelClick" />
-          <Button Content="Создать" Classes="PrimaryButton" Click="OnOkClick" />
-        </StackPanel>
+        WindowStartupLocation="CenterOwner">
+  <controls:DialogChrome x:Name="Chrome" Title="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}">
+    <StackPanel Margin="24" Spacing="16">
+      <TextBlock Text="Имя папки:" Classes="StaticLabel" />
+      <TextBox x:Name="NameBox" Watermark="название папки" Classes="DarkInput" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+        <Button Content="Отмена" Classes="SecondaryButton" Click="OnCancelClick" />
+        <Button Content="Создать" Classes="PrimaryButton" Click="OnOkClick" />
       </StackPanel>
-    </Grid>
-  </Border>
-</Window>
+    </StackPanel>
+  </controls:DialogChrome>
+</local:MemorandumDialogWindow>

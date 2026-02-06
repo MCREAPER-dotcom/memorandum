@@ -13,13 +13,15 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
+using Memorandum.Desktop;
 using Memorandum.Desktop.Models;
+using Memorandum.Desktop.Resources;
 using Memorandum.Desktop.Services;
 using Memorandum.Desktop.Themes;
 
 namespace Memorandum.Desktop.Views;
 
-public partial class NoteEditView : UserControl
+public partial class NoteEditView : UserControl, IContentBlockRemover
 {
     private NoteCardItem? _editingNote;
     private readonly List<string> _availableTags = new();
@@ -31,6 +33,7 @@ public partial class NoteEditView : UserControl
     public NoteEditView()
     {
         InitializeComponent();
+        DragDrop.SetAllowDrop(ImageDropZone, true);
         ImageDropZone.AddHandler(DragDrop.DragOverEvent, OnDragOver);
         ImageDropZone.AddHandler(DragDrop.DropEvent, OnDrop);
         ImageDropZone.PointerPressed += OnImageDropZonePointerPressed;
@@ -38,6 +41,7 @@ public partial class NoteEditView : UserControl
         var contentCard = ContentBox.Parent?.Parent as Border;
         if (contentCard != null)
         {
+            DragDrop.SetAllowDrop(contentCard, true);
             contentCard.AddHandler(DragDrop.DragOverEvent, OnDragOver);
             contentCard.AddHandler(DragDrop.DropEvent, OnDrop);
         }
@@ -49,14 +53,26 @@ public partial class NoteEditView : UserControl
         ContentBlocksControl.ItemsSource = ContentParser.Parse(content);
     }
 
+    public void RemoveBlock(ContentBlockItem block)
+    {
+        var marker = block is FileContentBlock f ? f.GetMarkerToRemove()
+            : block is ImageContentBlock i ? i.GetMarkerToRemove()
+            : null;
+        if (string.IsNullOrEmpty(marker)) return;
+        var text = ContentBox.Text ?? "";
+        var idx = text.IndexOf(marker);
+        if (idx < 0) return;
+        text = text.Remove(idx, marker.Length);
+        ContentBox.Text = text;
+        RefreshContentBlocks();
+    }
+
     public System.Action? OnBack { get; set; }
 
     public System.Action<string, string, string, string?, IReadOnlyList<string>, bool, NoteCardItem?, int?, string?, int, bool, bool, bool, DateTime?>? OnSaveRequested { get; set; }
     public System.Action<NoteCardItem>? OnDeleteRequested { get; set; }
     public System.Action<string, string?>? OnTagCreated { get; set; }
-    public Func<System.Threading.Tasks.Task>? OnAddFolderRequested { get; set; }
-    public Func<string, System.Threading.Tasks.Task>? OnAddSubfolderRequested { get; set; }
-    public Func<string, Task<TagCreationResult?>>? ShowTagDialogAsync { get; set; }
+    public IFolderTagCreationService? FolderTagCreationService { get; set; }
 
     public void SetFolders(IReadOnlyList<FolderRowForEdit> folders)
     {
@@ -83,7 +99,7 @@ public partial class NoteEditView : UserControl
             };
             var rowPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };
             rowPanel.Children.Add(folderBtn);
-            if (OnAddSubfolderRequested != null)
+            if (FolderTagCreationService != null)
             {
                 var plusBtn = new Button
                 {
@@ -98,8 +114,8 @@ public partial class NoteEditView : UserControl
                     plusBtn.Foreground = brush;
                 plusBtn.Click += async (_, _) =>
                 {
-                    if (plusBtn.Tag is string parentPath)
-                        await (OnAddSubfolderRequested?.Invoke(parentPath) ?? System.Threading.Tasks.Task.CompletedTask).ConfigureAwait(true);
+                    if (plusBtn.Tag is string parentPath && FolderTagCreationService != null)
+                        await FolderTagCreationService.AddSubfolderAsync(parentPath).ConfigureAwait(true);
                 };
                 rowPanel.Children.Add(plusBtn);
             }
@@ -110,7 +126,8 @@ public partial class NoteEditView : UserControl
 
     private async void OnAddFolderClick(object? sender, RoutedEventArgs e)
     {
-        await (OnAddFolderRequested?.Invoke() ?? System.Threading.Tasks.Task.CompletedTask).ConfigureAwait(true);
+        if (FolderTagCreationService != null)
+            await FolderTagCreationService.AddRootFolderAsync().ConfigureAwait(true);
     }
 
     public void SetAvailableTags(IReadOnlyList<string> tagNames, IReadOnlyDictionary<string, string>? colorKeysByTag = null)
@@ -152,7 +169,7 @@ public partial class NoteEditView : UserControl
         _selectedTags.Clear();
         if (note != null)
         {
-            TitleText.Text = "Редактирование заметки";
+            TitleText.Text = UiStrings.NoteEditTitle;
             TitleBox.Text = note.Title;
             DescriptionBox.Text = note.Preview ?? "";
             ContentBox.Text = note.Content;
@@ -174,13 +191,13 @@ public partial class NoteEditView : UserControl
         }
         else
         {
-            TitleText.Text = "Создание заметки";
+            TitleText.Text = UiStrings.NoteCreateTitle;
             TitleBox.Text = preset != null ? preset.Title : "";
             DescriptionBox.Text = "";
             ContentBox.Text = "";
             RefreshContentBlocks();
             DeleteButton.IsVisible = false;
-            _selectedFolderPath = null;
+            _selectedFolderPath = preset?.FolderName;
             ApplyFolderSelection();
             TimerDurationBox.Text = preset?.DurationMinutes?.ToString() ?? "";
             StickerBackgroundBox.Text = "";
@@ -331,28 +348,13 @@ public partial class NoteEditView : UserControl
         var clipboard = topLevel?.Clipboard;
         if (clipboard == null && Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
             clipboard = desktop.MainWindow?.Clipboard;
-        if (clipboard == null) return;
-
-        var text = await clipboard.GetTextAsync();
-        if (!string.IsNullOrEmpty(text))
+        var handle = topLevel?.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
+        Func<Task<string?>>? getText = clipboard != null ? (async () => await clipboard.GetTextAsync()) : null;
+        var content = await ContentInsertionService.GetPastedContentAsync(getText, handle);
+        if (!string.IsNullOrEmpty(content))
         {
-            AppendToContent(text);
+            AppendToContent(content);
             RefreshContentBlocks();
-            return;
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && topLevel != null)
-        {
-            var handle = topLevel.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
-            if (handle != IntPtr.Zero)
-            {
-                var imagePath = ScreenshotClipboardService.GetImageFromClipboardAndSaveToFile(handle);
-                if (!string.IsNullOrEmpty(imagePath))
-                {
-                    AppendToContent(Environment.NewLine + "[Изображение: " + imagePath + "]" + Environment.NewLine);
-                    RefreshContentBlocks();
-                }
-            }
         }
     }
 
@@ -392,44 +394,38 @@ public partial class NoteEditView : UserControl
     private void OnDrop(object? sender, DragEventArgs e)
     {
         var files = e.Data?.GetFiles();
-        if (files != null)
+        if (files == null) return;
+        var paths = files.Select(f => f.TryGetLocalPath()).Where(p => !string.IsNullOrEmpty(p)).Select(p => p!).ToList();
+        var content = ContentInsertionService.ProcessDroppedPaths(paths);
+        if (!string.IsNullOrEmpty(content))
         {
-            var lines = new List<string>();
-            foreach (var item in files)
-            {
-                var path = item.TryGetLocalPath();
-                if (string.IsNullOrEmpty(path)) continue;
-                if (Directory.Exists(path))
-                    lines.Add("[Папка: " + path + "]");
-                else
-                {
-                    var copied = NoteAttachmentsHelper.CopyToAttachments(path);
-                    lines.Add(copied != null ? "[Файл: " + copied + "]" : "[Файл: " + path + "]");
-                }
-            }
-            if (lines.Count > 0)
-            {
-                AppendToContent(Environment.NewLine + string.Join(Environment.NewLine, lines) + Environment.NewLine);
-                RefreshContentBlocks();
-                e.Handled = true;
-            }
+            AppendToContent(content);
+            RefreshContentBlocks();
+            e.Handled = true;
         }
     }
 
     private async void OnCreateTagClick(object? sender, RoutedEventArgs e)
     {
         TagCreationResult? result;
-        if (ShowTagDialogAsync != null)
+        if (FolderTagCreationService != null)
         {
-            result = await ShowTagDialogAsync("Новый тег");
+            result = await FolderTagCreationService.CreateTagAsync("Новый тег").ConfigureAwait(true);
+            if (result != null && !string.IsNullOrWhiteSpace(result.Name))
+            {
+                _selectedTags.Add(result.Name.Trim());
+                if (!_availableTags.Contains(result.Name.Trim()))
+                    _availableTags.Add(result.Name.Trim());
+                if (!string.IsNullOrEmpty(result.ColorKey))
+                    _tagColors[result.Name.Trim()] = result.ColorKey;
+                BuildTagsPanel();
+            }
+            return;
         }
-        else
-        {
-            var owner = TopLevel.GetTopLevel(this) as Window;
-            if (owner == null) return;
-            var dlg = new TagNameDialog { Title = "Новый тег" };
-            result = await dlg.ShowDialog<TagCreationResult?>(owner);
-        }
+        var owner = TopLevel.GetTopLevel(this) as Window;
+        if (owner == null) return;
+        var dlg = new TagNameDialog { Title = "Новый тег" };
+        result = await dlg.ShowDialog<TagCreationResult?>(owner);
         if (result == null || string.IsNullOrWhiteSpace(result.Name))
             return;
         var name = result.Name.Trim();

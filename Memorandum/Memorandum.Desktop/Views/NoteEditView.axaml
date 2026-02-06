@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:views="using:Memorandum.Desktop.Views"
              xmlns:controls="using:Memorandum.Desktop.Controls"
+             xmlns:res="using:Memorandum.Desktop.Resources"
              x:Class="Memorandum.Desktop.Views.NoteEditView"
              Classes="NoteEditForm"
              Background="{StaticResource AppBackground}"
@@ -11,14 +12,14 @@
     <Border Grid.Row="0" Classes="AppHeader">
       <Grid ColumnDefinitions="Auto,*,Auto">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <Button x:Name="BackButton" Content="Назад" Classes="SecondaryButton" Click="OnBackClick" />
-          <TextBlock x:Name="TitleText" Text="Редактирование заметки" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
+          <Button x:Name="BackButton" Content="{x:Static res:UiStrings.Back}" Classes="SecondaryButton" Click="OnBackClick" />
+          <TextBlock x:Name="TitleText" Text="{x:Static res:UiStrings.NoteEditTitle}" Classes="PageTitle" VerticalAlignment="Center" />
         </StackPanel>
         <Panel Grid.Column="1" />
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <Button x:Name="DeleteButton" Content="Удалить" Background="{StaticResource TagPillRed}" Foreground="{StaticResource PrimaryForeground}" Padding="12,8" IsVisible="False" Click="OnDeleteClick" />
-          <Button x:Name="CancelButton" Content="Отмена" Classes="SecondaryButton" Click="OnCancelClick" />
-          <Button x:Name="SaveButton" Content="Сохранить" Classes="PrimaryButton" Click="OnSaveClick" />
+          <Button x:Name="DeleteButton" Content="{x:Static res:UiStrings.Delete}" Background="{StaticResource TagPillRed}" Foreground="{StaticResource PrimaryForeground}" Padding="12,8" IsVisible="False" Click="OnDeleteClick" />
+          <Button x:Name="CancelButton" Content="{x:Static res:UiStrings.Cancel}" Classes="SecondaryButton" Click="OnCancelClick" />
+          <Button x:Name="SaveButton" Content="{x:Static res:UiStrings.Save}" Classes="PrimaryButton" Click="OnSaveClick" />
         </StackPanel>
       </Grid>
     </Border>
@@ -28,98 +29,105 @@
         <StackPanel Grid.Column="0" Spacing="20" Margin="0,0,20,0">
           <Border Classes="NoteEditCard">
             <StackPanel Spacing="12">
-              <TextBlock Text="Заголовок" Classes="SectionLabel" />
-              <TextBox x:Name="TitleBox" Watermark="Заголовок заметки" Classes="DarkInput" />
+              <TextBlock Text="{x:Static res:UiStrings.NoteTitle}" Classes="SectionLabel" />
+              <TextBox x:Name="TitleBox" Watermark="{x:Static res:UiStrings.NoteTitleWatermark}" Classes="DarkInput" />
             </StackPanel>
           </Border>
           <Border Classes="NoteEditCard">
             <StackPanel Spacing="12">
-              <TextBlock Text="Содержимое" Classes="SectionLabel" />
-              <TextBlock Text="Описание заметки" Classes="StaticLabelSmall" Margin="0,0,0,4" />
-              <TextBox x:Name="DescriptionBox" MinHeight="60" MaxHeight="120" Watermark="Краткое описание для карточки..." TextWrapping="Wrap" Classes="DarkInput" AcceptsReturn="True" />
-              <TextBlock Text="Полный текст заметки" Classes="StaticLabelSmall" Margin="0,8,0,4" />
+              <TextBlock Text="{x:Static res:UiStrings.Content}" Classes="SectionLabel" />
+              <TextBlock Text="{x:Static res:UiStrings.DescriptionNote}" Classes="StaticLabelSmall" Margin="0,0,0,4" />
+              <TextBox x:Name="DescriptionBox" MinHeight="60" MaxHeight="120" Watermark="{x:Static res:UiStrings.DescriptionWatermark}" TextWrapping="Wrap" Classes="DarkInput" AcceptsReturn="True" />
+              <TextBlock Text="Вложения и изображения" Classes="StaticLabelSmall" Margin="0,12,0,4" />
               <Border Background="{StaticResource InputFieldBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12" MinHeight="80" Margin="0,0,0,8">
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="220">
-                  <ItemsControl x:Name="ContentBlocksControl" ItemTemplate="{StaticResource ContentBlockTemplateSelector}">
-                    <ItemsControl.ItemsPanel>
-                      <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                      </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                  </ItemsControl>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" MaxHeight="300" MaxWidth="400" Focusable="True" AllowAutoHide="False">
+                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ItemsControl x:Name="ContentBlocksControl" ItemTemplate="{StaticResource ContentBlockTemplateSelector}" HorizontalAlignment="Left">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                  </StackPanel>
                 </ScrollViewer>
               </Border>
-              <TextBox x:Name="ContentBox" AcceptsReturn="True" MinHeight="120" Watermark="Текст заметки, вложения..." TextWrapping="Wrap" Classes="DarkInput" />
+              <TextBox x:Name="ContentBox" AcceptsReturn="True" MinHeight="120" Watermark="{x:Static res:UiStrings.ContentWatermark}" TextWrapping="Wrap" Classes="DarkInput" IsVisible="False" />
             </StackPanel>
           </Border>
           <Border Classes="NoteEditCard">
             <StackPanel Spacing="12">
-              <TextBlock Text="Гиперссылки" Classes="SectionLabel" />
+              <TextBlock Text="{x:Static res:UiStrings.Hyperlinks}" Classes="SectionLabel" />
               <Grid ColumnDefinitions="*,Auto">
-                <TextBox Grid.Column="0" x:Name="LinkBox" Watermark="https://example.com" Margin="0,0,8,0" Classes="DarkInput" />
-                <Button Grid.Column="1" Content="Добавить" Classes="PrimaryButton" Click="OnAddLinkClick" Padding="16,10" />
+                <TextBox Grid.Column="0" x:Name="LinkBox" Watermark="{x:Static res:UiStrings.LinkWatermark}" Margin="0,0,8,0" Classes="DarkInput" />
+                <Button Grid.Column="1" Content="{x:Static res:UiStrings.Add}" Classes="PrimaryButton" Click="OnAddLinkClick" Padding="16,10" />
               </Grid>
             </StackPanel>
           </Border>
-          <Border x:Name="ImageDropZone" Classes="NoteEditCard ImageDropZone" Padding="24" MinHeight="120" Cursor="Hand">
-            <StackPanel Spacing="12" VerticalAlignment="Center" HorizontalAlignment="Center">
-              <TextBlock Text="Загрузить изображение или вставить из буфера" Classes="StaticLabel" HorizontalAlignment="Center" IsHitTestVisible="False" />
-              <Button x:Name="PasteFromClipboardButton" Content="Вставить из буфера" Classes="SecondaryButton" HorizontalAlignment="Center" Click="OnPasteFromClipboardClick" />
+          <Border x:Name="ImageDropZone" Classes="NoteEditCard ImageDropZone" Padding="20" MinHeight="80" Cursor="Hand">
+            <StackPanel Spacing="8" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+              <TextBlock Text="{x:Static res:UiStrings.LoadImageOrPaste}" Classes="StaticLabel" VerticalAlignment="Center" IsHitTestVisible="False" />
+              <Button x:Name="PasteFromClipboardButton" Content="{x:Static res:UiStrings.PasteFromClipboard}" Classes="SecondaryButton" Click="OnPasteFromClipboardClick" />
             </StackPanel>
           </Border>
         </StackPanel>
-        <StackPanel Grid.Column="1" Spacing="20">
-          <Border Classes="NoteEditCard">
-            <StackPanel Spacing="12">
-              <TextBlock Text="Тип заметки" Classes="SectionLabel" />
-              <StackPanel Orientation="Horizontal" Spacing="20">
-                <RadioButton x:Name="TypeNormal" Content="Обычная" GroupName="NoteType" IsChecked="True" />
-                <RadioButton x:Name="TypeSticker" Content="Стикер" GroupName="NoteType" />
+        <Grid Grid.Column="1" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+          <Border Grid.Row="0" Grid.Column="0" Classes="NoteEditCard" Margin="0,0,10,10">
+            <StackPanel Spacing="16">
+              <TextBlock Text="{x:Static res:UiStrings.NoteParams}" Classes="SectionLabel" Foreground="{StaticResource LabelForeground}" Margin="0,0,0,4" />
+              <StackPanel Spacing="8">
+                <TextBlock Text="{x:Static res:UiStrings.Type}" Classes="StaticLabel" Foreground="{StaticResource LabelForeground}" />
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                  <RadioButton x:Name="TypeNormal" Content="{x:Static res:UiStrings.Regular}" GroupName="NoteType" IsChecked="True" Foreground="{StaticResource LabelForeground}" />
+                  <RadioButton x:Name="TypeSticker" Content="{x:Static res:UiStrings.Sticker}" GroupName="NoteType" Foreground="{StaticResource LabelForeground}" />
+                </StackPanel>
+              </StackPanel>
+              <StackPanel Spacing="8">
+                <TextBlock Text="{x:Static res:UiStrings.TimerMin}" Classes="StaticLabel" Foreground="{StaticResource LabelForeground}" />
+                <TextBox x:Name="TimerDurationBox" Watermark="15" Classes="DarkInput" />
+              </StackPanel>
+              <StackPanel Spacing="8" ClipToBounds="False">
+                <TextBlock Text="{x:Static res:UiStrings.Deadline}" Classes="StaticLabel" Foreground="{StaticResource LabelForeground}" />
+                <TextBlock Text="{x:Static res:UiStrings.DeadlineHint}" Classes="StaticLabelSmall" Foreground="{StaticResource LabelForeground}" />
+                <views:DeadlinePickerControl x:Name="DeadlinePickerControl" />
               </StackPanel>
             </StackPanel>
           </Border>
-          <Border Classes="NoteEditCard">
+          <Border Grid.Row="0" Grid.Column="1" Classes="NoteEditCard" Margin="10,0,0,10">
+            <StackPanel Spacing="16">
+              <TextBlock Text="{x:Static res:UiStrings.Organization}" Classes="SectionLabel" Foreground="{StaticResource LabelForeground}" Margin="0,0,0,4" />
+              <StackPanel Spacing="8">
+                <TextBlock Text="{x:Static res:UiStrings.NoteFolderLabel}" Classes="StaticLabel" Foreground="{StaticResource LabelForeground}" />
+                <Button x:Name="AddFolderButton" Content="{x:Static res:UiStrings.AddFolder}" Classes="GraphLinkButton" HorizontalAlignment="Left" Click="OnAddFolderClick" />
+                <ScrollViewer MaxHeight="140" HorizontalScrollBarVisibility="Auto">
+                  <StackPanel x:Name="FolderPanel" Spacing="2" />
+                </ScrollViewer>
+              </StackPanel>
+              <Border Height="1" Background="{StaticResource GraphBorderBrush}" Margin="0,4,0,4" Opacity="0.5" />
+              <StackPanel Spacing="8">
+                <TextBlock Text="{x:Static res:UiStrings.NoteTagsLabel}" Classes="StaticLabel" Foreground="{StaticResource LabelForeground}" />
+                <WrapPanel x:Name="TagsWrap" Orientation="Horizontal" />
+                <Button Content="{x:Static res:UiStrings.CreateTag}" Classes="GraphLinkButton" HorizontalAlignment="Left" Click="OnCreateTagClick" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Classes="NoteEditCard" Margin="0,0,0,0">
             <StackPanel Spacing="12">
-              <TextBlock Text="Таймер (мин, необязательно)" Classes="SectionLabel" />
-              <TextBox x:Name="TimerDurationBox" Watermark="15" Classes="DarkInput" />
+              <TextBlock Text="{x:Static res:UiStrings.StickerAppearance}" Classes="SectionLabel" Foreground="{StaticResource LabelForeground}" />
+              <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static res:UiStrings.BackgroundColorHex}" Classes="StaticLabel" Foreground="{StaticResource LabelForeground}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="StickerBackgroundBox" Watermark="#fffde7" Classes="DarkInput" Margin="0,0,24,0" />
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Static res:UiStrings.TransparencyPercent}" Classes="StaticLabel" Foreground="{StaticResource LabelForeground}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <TextBox Grid.Row="0" Grid.Column="3" x:Name="StickerTransparencyBox" Watermark="100" Classes="DarkInput" />
+                <StackPanel Grid.Row="1" Grid.ColumnSpan="4" Orientation="Horizontal" Spacing="24" Margin="0,10,0,0">
+                  <CheckBox x:Name="StickerClickThroughCheck" Content="{x:Static res:UiStrings.StickerClickThrough}" Foreground="{StaticResource PrimaryForeground}" />
+                  <CheckBox x:Name="StickerPinnedCheck" Content="{x:Static res:UiStrings.StickerPinned}" Foreground="{StaticResource PrimaryForeground}" IsChecked="True" />
+                  <CheckBox x:Name="StickerCloseOnTimerCheck" Content="{x:Static res:UiStrings.StickerCloseOnTimer}" Foreground="{StaticResource PrimaryForeground}" />
+                </StackPanel>
+              </Grid>
             </StackPanel>
           </Border>
-          <Border Classes="NoteEditCard" ClipToBounds="False">
-            <StackPanel Spacing="12" ClipToBounds="False">
-              <TextBlock Text="Дедлайн" Classes="SectionLabel" />
-              <TextBlock Text="Выберите дату и время или нажмите «Без дедлайна»" Classes="StaticLabelSmall" />
-              <views:DeadlinePickerControl x:Name="DeadlinePickerControl" />
-            </StackPanel>
-          </Border>
-          <Border Classes="NoteEditCard">
-            <StackPanel Spacing="12">
-              <TextBlock Text="Папка" Classes="SectionLabel" />
-              <Button x:Name="AddFolderButton" Content="+ Добавить папку" Classes="GraphLinkButton" HorizontalAlignment="Left" Click="OnAddFolderClick" />
-              <ScrollViewer MaxHeight="200" HorizontalScrollBarVisibility="Auto">
-                <StackPanel x:Name="FolderPanel" Spacing="2" />
-              </ScrollViewer>
-            </StackPanel>
-          </Border>
-          <Border Classes="NoteEditCard">
-            <StackPanel Spacing="12">
-              <TextBlock Text="Теги" Classes="SectionLabel" />
-              <WrapPanel x:Name="TagsWrap" Orientation="Horizontal" />
-              <Button Content="+ Создать новый тег" Classes="GraphLinkButton" HorizontalAlignment="Left" Click="OnCreateTagClick" />
-            </StackPanel>
-          </Border>
-          <Border Classes="NoteEditCard">
-            <StackPanel Spacing="10">
-              <TextBlock Text="Оформление стикера" Classes="SectionLabel" />
-              <TextBlock Text="Цвет фона (#hex):" Classes="StaticLabel" />
-              <TextBox x:Name="StickerBackgroundBox" Watermark="#fffde7" Classes="DarkInput" />
-              <TextBlock Text="Прозрачность (%):" Classes="StaticLabel" />
-              <TextBox x:Name="StickerTransparencyBox" Watermark="100" Classes="DarkInput" />
-              <CheckBox x:Name="StickerClickThroughCheck" Content="Пропускать клики сквозь окно" Foreground="{StaticResource PrimaryForeground}" />
-              <CheckBox x:Name="StickerPinnedCheck" Content="Поверх всех окон" Foreground="{StaticResource PrimaryForeground}" IsChecked="True" />
-              <CheckBox x:Name="StickerCloseOnTimerCheck" Content="Закрыть окно при завершении таймера" Foreground="{StaticResource PrimaryForeground}" />
-            </StackPanel>
-          </Border>
-        </StackPanel>
+        </Grid>
       </Grid>
         <Border Height="120" Background="Transparent" IsHitTestVisible="False" />
       </StackPanel>

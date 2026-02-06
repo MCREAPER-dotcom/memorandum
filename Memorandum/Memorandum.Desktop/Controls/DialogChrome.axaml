@@ -1,0 +1,26 @@
+<ContentControl xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                x:Class="Memorandum.Desktop.Controls.DialogChrome">
+  <ContentControl.Template>
+    <ControlTemplate>
+      <Border BorderBrush="{StaticResource AppBackground}" BorderThickness="1">
+        <Grid RowDefinitions="Auto,*">
+          <Border x:Name="HeaderBorder" Grid.Row="0" Classes="AppHeader" Background="Transparent" Cursor="SizeAll" PointerPressed="OnTitleBarPointerPressed">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <Image x:Name="TitleBarIcon" Width="20" Height="20" IsVisible="False" />
+                <TextBlock x:Name="TitleBarTitle" Text="{TemplateBinding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,12,0">
+                <Button Content="—" FontSize="14" Classes="TitleBarButton" Click="OnMinimizeClick" />
+                <Button Content="□" FontSize="12" Classes="TitleBarButton" Click="OnMaximizeClick" />
+                <Button Content="×" FontSize="18" Classes="TitleBarButton CloseButton" Click="OnCloseClick" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <ContentPresenter Grid.Row="1" Content="{TemplateBinding Content}" />
+        </Grid>
+      </Border>
+    </ControlTemplate>
+  </ContentControl.Template>
+</ContentControl>

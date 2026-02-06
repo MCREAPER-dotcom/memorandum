@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Memorandum.Desktop.Controls"
+             xmlns:res="using:Memorandum.Desktop.Resources"
              x:Class="Memorandum.Desktop.Views.NotesListView"
              Background="{StaticResource AppBackground}"
              HorizontalAlignment="Stretch"
@@ -10,8 +11,8 @@
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Grid.Column="0" Text="{Binding FoundCountText}" Foreground="{StaticResource PrimaryForeground}" FontSize="14" VerticalAlignment="Center" />
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <TextBlock Text="Сортировка:" Foreground="{StaticResource GraphLabelSecondary}" FontSize="14" VerticalAlignment="Center" />
-          <ComboBox x:Name="SortCombo" MinWidth="200" PlaceholderText="По дате изменения" Classes="DarkInput" />
+          <TextBlock Text="{x:Static res:UiStrings.SortLabel}" Classes="StaticLabelSecondary" VerticalAlignment="Center" />
+          <ComboBox x:Name="SortCombo" MinWidth="200" PlaceholderText="{x:Static res:UiStrings.SortByDatePlaceholder}" Classes="DarkInput" />
         </StackPanel>
       </Grid>
     </Border>
@@ -28,7 +29,7 @@
                     Background="{StaticResource SurfaceBackground}"
                     BorderBrush="{Binding IsHighlighted, Converter={StaticResource BoolToBorderBrushConverter}}"
                     BorderThickness="1" CornerRadius="8">
-              <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+              <Grid RowDefinitions="Auto,Auto,Auto,28,Auto">
                 <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
                   <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" Foreground="{StaticResource PrimaryForeground}" TextTrimming="CharacterEllipsis" />
                   <Border Grid.Column="1" Padding="8,4" CornerRadius="4" Background="{StaticResource NoteTypeNormalBackground}" IsVisible="{Binding IsNormal}">
@@ -38,47 +39,56 @@
                     <TextBlock Text="{Binding TypeLabel}" FontSize="12" Foreground="{StaticResource NoteTypeStickerForeground}" />
                   </Border>
                 </Grid>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding ContentBlocks}" Margin="0,8,0,0" MaxHeight="220"
-                              ItemTemplate="{StaticResource ContentBlockTemplateSelector}">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                      <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                </ItemsControl>
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,6,0,0" IsVisible="{Binding HasTimer}">
-                  <TextBlock Text="{Binding TimerDisplayText}" FontSize="12" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
-                  <Button Command="{Binding StartTimerCommand}" Padding="4" MinWidth="28" MinHeight="28" ToolTip.Tip="Старт таймера"
-                          Background="Transparent" BorderThickness="0">
-                    <Image Source="{StaticResource PlayIcon}" Width="18" Height="18" />
-                  </Button>
-                  <Button Command="{Binding PauseTimerCommand}" Padding="4" MinWidth="28" MinHeight="28" ToolTip.Tip="Остановить таймер"
-                          Background="Transparent" BorderThickness="0">
-                    <Image Source="{StaticResource PauseIcon}" Width="18" Height="18" />
-                  </Button>
-                </StackPanel>
-                <ItemsControl Grid.Row="3" ItemsSource="{Binding TagLabels}" Margin="0,8,0,0">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                      <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                      <Border Margin="0,0,4,4" Padding="6,2" CornerRadius="4" Background="{Binding Converter={StaticResource TagNameToBrushConverter}}">
-                        <TextBlock Text="{Binding}" FontSize="12" Foreground="#f3f4f6" />
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <TextBlock Grid.Row="4" Text="{Binding DateText}" FontSize="12" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,8,0,0" />
-                <Border Grid.Row="5" Padding="6,4" CornerRadius="4" Background="{StaticResource AccentBrush}" Margin="0,6,0,0" IsVisible="{Binding HasDeadline}">
-                  <TextBlock Text="{Binding DeadlineDisplayText}" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                <Border Grid.Row="1" MinHeight="200" Margin="0,8,0,0" ClipToBounds="False">
+                  <StackPanel Spacing="6">
+                    <Border Background="{StaticResource InputFieldBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12" MinHeight="80" Width="280" Margin="0,0,0,8">
+                      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" MaxHeight="300" Focusable="True" AllowAutoHide="False">
+                        <ItemsControl ItemsSource="{Binding ContentBlocks}"
+                                      ItemTemplate="{StaticResource ContentBlockTemplateSelector}"
+                                      HorizontalAlignment="Left">
+                          <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                              <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                          </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                      </ScrollViewer>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" Spacing="8" MinHeight="32" IsVisible="{Binding HasTimer}">
+                      <TextBlock Text="{Binding TimerDisplayText}" FontSize="12" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                      <Button Command="{Binding StartTimerCommand}" Padding="4" MinWidth="28" MinHeight="28" ToolTip.Tip="Старт таймера"
+                              Background="Transparent" BorderThickness="0">
+                        <Image Source="{StaticResource PlayIcon}" Width="18" Height="18" />
+                      </Button>
+                      <Button Command="{Binding PauseTimerCommand}" Padding="4" MinWidth="28" MinHeight="28" ToolTip.Tip="Остановить таймер"
+                              Background="Transparent" BorderThickness="0">
+                        <Image Source="{StaticResource PauseIcon}" Width="18" Height="18" />
+                      </Button>
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding TagLabels}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border Margin="0,0,4,4" Padding="6,2" CornerRadius="4" Background="{Binding Converter={StaticResource TagNameToBrushConverter}}">
+                            <TextBlock Text="{Binding}" FontSize="12" Foreground="#f3f4f6" />
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
                 </Border>
-                <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="12" Margin="0,12,0,0" HorizontalAlignment="Right">
-                  <Button Content="Редактировать" Classes="GraphLinkButton" Command="{Binding EditCommand}" />
-                  <Button Content="Открыть как стикер" Classes="GraphLinkButton" IsVisible="{Binding IsSticker}" Command="{Binding OpenStickerCommand}" />
-                </StackPanel>
+                <TextBlock Grid.Row="2" Text="{Binding DateText}" FontSize="12" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,10,0,0" VerticalAlignment="Center" />
+                <Border Grid.Row="3" Padding="6,4" CornerRadius="4" Background="{StaticResource AccentBrush}" Margin="0,6,0,0" IsVisible="{Binding HasDeadline}" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding DeadlineDisplayText}" FontSize="12" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                </Border>
+                <WrapPanel Grid.Row="4" Orientation="Horizontal" Margin="0,12,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                  <Button Content="{x:Static res:UiStrings.Edit}" Classes="GraphLinkButton" Command="{Binding EditCommand}" Margin="0,0,12,0" />
+                  <Button Content="{x:Static res:UiStrings.OpenAsSticker}" Classes="GraphLinkButton" IsVisible="{Binding IsSticker}" Command="{Binding OpenStickerCommand}" />
+                </WrapPanel>
               </Grid>
             </Border>
           </DataTemplate>

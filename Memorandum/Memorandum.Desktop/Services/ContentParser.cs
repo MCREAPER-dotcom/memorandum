@@ -43,11 +43,33 @@ public static class ContentParser
 
             var token = m.Value;
             if (FileRegex.Match(token) is { Success: true } fileMatch)
-                blocks.Add(ContentBlockItem.File(fileMatch.Groups[1].Value.Trim()));
+            {
+                var fileValue = fileMatch.Groups[1].Value.Trim();
+                var pipe = fileValue.IndexOf('|');
+                if (pipe >= 0)
+                {
+                    var path = fileValue.Substring(0, pipe).Trim();
+                    var displayName = fileValue.Substring(pipe + 1).Trim();
+                    blocks.Add(ContentBlockItem.File(path, displayName));
+                }
+                else
+                    blocks.Add(ContentBlockItem.File(fileValue));
+            }
             else if (ImageRegex.Match(token) is { Success: true } imgMatch)
                 blocks.Add(ContentBlockItem.Image(imgMatch.Groups[1].Value.Trim()));
             else if (FolderRegex.Match(token) is { Success: true } folderMatch)
-                blocks.Add(ContentBlockItem.File(folderMatch.Groups[1].Value.Trim()));
+            {
+                var folderValue = folderMatch.Groups[1].Value.Trim();
+                var folderPipe = folderValue.IndexOf('|');
+                if (folderPipe >= 0)
+                {
+                    var path = folderValue.Substring(0, folderPipe).Trim();
+                    var displayName = folderValue.Substring(folderPipe + 1).Trim();
+                    blocks.Add(ContentBlockItem.File(path, displayName));
+                }
+                else
+                    blocks.Add(ContentBlockItem.File(folderValue));
+            }
 
             lastIndex = m.Index + m.Length;
         }

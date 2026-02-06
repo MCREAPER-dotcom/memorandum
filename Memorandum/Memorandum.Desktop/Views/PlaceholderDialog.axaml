@@ -1,13 +1,16 @@
-<Window xmlns="https://github.com/avaloniaui"
+<local:MemorandumDialogWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:Memorandum.Desktop"
+        xmlns:controls="using:Memorandum.Desktop.Controls"
         x:Class="Memorandum.Desktop.Views.PlaceholderDialog"
         Title="Memorandum"
         Width="360"
         Height="160"
-        WindowStartupLocation="CenterOwner"
-        Background="{StaticResource AppBackground}">
-  <StackPanel Margin="24" Spacing="16">
-    <TextBlock x:Name="MessageText" Text="" TextWrapping="Wrap" Foreground="{StaticResource PrimaryForeground}" FontSize="14" />
-    <Button Content="OK" Classes="PrimaryButton" HorizontalAlignment="Right" Click="OnOkClick" />
-  </StackPanel>
-</Window>
+        WindowStartupLocation="CenterOwner">
+  <controls:DialogChrome Title="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}">
+    <StackPanel Margin="24" Spacing="16">
+      <TextBlock x:Name="MessageText" Text="" TextWrapping="Wrap" Foreground="{StaticResource PrimaryForeground}" FontSize="14" />
+      <Button Content="OK" Classes="PrimaryButton" HorizontalAlignment="Right" Click="OnOkClick" />
+    </StackPanel>
+  </controls:DialogChrome>
+</local:MemorandumDialogWindow>

@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Memorandum.Desktop;
 using Memorandum.Desktop.Models;
 using Memorandum.Desktop.Services;
 using Memorandum.Desktop.Themes;
@@ -11,7 +12,7 @@ using IModalOverlayHost = Memorandum.Desktop.IModalOverlayHost;
 
 namespace Memorandum.Desktop.Views;
 
-public partial class TagNameDialog : Window
+public partial class TagNameDialog : MemorandumDialogWindow
 {
     private static IBrush[]? _cachedBrushes;
     private TaskCompletionSource<TagCreationResult?>? _tcs;
@@ -22,7 +23,6 @@ public partial class TagNameDialog : Window
         InitializeComponent();
         SelectedColorKey = PaletteConstants.TagPillResourceKeys.Length > 0 ? PaletteConstants.TagPillResourceKeys[0] : "";
         BuildColorPanel();
-        ApplyCachedIcon();
         Closed += (_, _) =>
         {
             _tcs?.TrySetResult(null);
@@ -59,40 +59,6 @@ public partial class TagNameDialog : Window
         }
         _cachedBrushes = list;
     }
-
-    private void ApplyCachedIcon()
-    {
-        if (AppIconCache.Icon == null)
-            return;
-        Icon = AppIconCache.Icon;
-        if (TitleBarIcon != null && AppIconCache.Bitmap != null)
-        {
-            TitleBarIcon.Source = AppIconCache.Bitmap;
-            TitleBarIcon.IsVisible = true;
-        }
-    }
-
-    private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            return;
-        var src = e.Source as Control;
-        while (src != null)
-        {
-            if (src is Button || src is TextBox)
-                return;
-            src = src.Parent as Control;
-        }
-        BeginMoveDrag(e);
-    }
-
-    private void OnMinimizeClick(object? sender, RoutedEventArgs e) =>
-        WindowState = WindowState.Minimized;
-
-    private void OnMaximizeClick(object? sender, RoutedEventArgs e) =>
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-
-    private void OnCloseClick(object? sender, RoutedEventArgs e) => CompleteWithResult(null);
 
     public string? Result { get; private set; }
     public TagCreationResult? CreationResult { get; private set; }

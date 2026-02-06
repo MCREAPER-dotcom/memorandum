@@ -47,6 +47,15 @@ public sealed partial class MainViewModel : ViewModelBase
         NotesList = new NotesListViewModel(notesPersistence);
         _graphDataProvider = new NotesGraphDataProvider(() => NotesList.GetAllNotes());
 
+        var appState = AppStateStorage.Load();
+        _folderPaths.Clear();
+        if (appState.FolderPaths.Count > 0)
+            _folderPaths.AddRange(appState.FolderPaths);
+        else
+            _folderPaths.AddRange(MainViewModelConstants.SidebarFolderNames);
+        foreach (var kv in appState.TagColorKeys)
+            _tagColorKeys[kv.Key] = kv.Value;
+
         NotesList.OnEditRequested = note => ShowNoteEditRequested?.Invoke(note);
         NotesList.OnOpenStickerRequested = note =>
         {
@@ -129,6 +138,7 @@ public sealed partial class MainViewModel : ViewModelBase
         if (!_folderPaths.Contains(trimmed, StringComparer.OrdinalIgnoreCase))
         {
             _folderPaths.Add(trimmed);
+            SaveAppState();
             RefreshSidebarRequested?.Invoke();
         }
     }
@@ -141,6 +151,7 @@ public sealed partial class MainViewModel : ViewModelBase
         if (!_folderPaths.Contains(newPath, StringComparer.OrdinalIgnoreCase))
         {
             _folderPaths.Add(newPath);
+            SaveAppState();
             RefreshSidebarRequested?.Invoke();
         }
     }
@@ -153,13 +164,20 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             if (!string.IsNullOrEmpty(colorKey))
                 _tagColorKeys[trimmed] = colorKey;
+            SaveAppState();
             RefreshSidebarRequested?.Invoke();
             return;
         }
         _knownTagNames.Add(trimmed);
         if (!string.IsNullOrEmpty(colorKey))
             _tagColorKeys[trimmed] = colorKey;
+        SaveAppState();
         RefreshSidebarRequested?.Invoke();
+    }
+
+    private void SaveAppState()
+    {
+        AppStateStorage.Save(_folderPaths, _tagColorKeys);
     }
 
     public string? GetTagColorKey(string tagName)
@@ -206,8 +224,32 @@ public sealed partial class MainViewModel : ViewModelBase
             .ToList();
     }
 
+    /// <summary>
+    /// Восстанавливает список папок из заметок: все пути из FolderName и все родительские сегменты (тест/тест1 → тест, тест/тест1).
+    /// После перезапуска приложения иерархия папок на главной странице совпадает с графом.
+    /// </summary>
+    public void SyncFolderPathsFromNotes()
+    {
+        var fromNotes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var note in NotesList.GetAllNotes())
+        {
+            var fn = (note.FolderName ?? "").Trim();
+            if (string.IsNullOrEmpty(fn)) continue;
+            fromNotes.Add(fn);
+            for (var i = 0; i < fn.Length; i++)
+                if (fn[i] == '/')
+                    fromNotes.Add(fn[..i]);
+        }
+        foreach (var path in fromNotes)
+        {
+            if (!_folderPaths.Contains(path, StringComparer.OrdinalIgnoreCase))
+                _folderPaths.Add(path);
+        }
+    }
+
     public void RefreshFolderItems()
     {
+        SyncFolderPathsFromNotes();
         var counts = NotesList.GetFolderCounts();
         var ordered = OrderFolderPaths(_folderPaths);
         FolderItems.Clear();

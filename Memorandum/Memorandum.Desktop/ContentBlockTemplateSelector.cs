@@ -2,6 +2,7 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Memorandum.Desktop.Controls;
 using Memorandum.Desktop.Models;
 
 namespace Memorandum.Desktop;
@@ -27,7 +28,16 @@ public class ContentBlockTemplateSelector : IDataTemplate
             {
                 var control = template.Build(data);
                 if (control != null)
+                {
                     control.DataContext = data;
+                    if (control is FileAttachmentView fileView && data is FileContentBlock fileBlock)
+                    {
+                        fileView.FilePath = fileBlock.Path;
+                        fileView.FileDisplayName = fileBlock.DisplayName;
+                    }
+                    else if (control is ImageAttachmentView imageView && data is ImageContentBlock imageBlock)
+                        imageView.ImagePath = imageBlock.Path;
+                }
                 return control;
             }
         }

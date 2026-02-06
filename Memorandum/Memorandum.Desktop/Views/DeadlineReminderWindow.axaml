@@ -1,18 +1,21 @@
-<Window xmlns="https://github.com/avaloniaui"
+<local:MemorandumDialogWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:Memorandum.Desktop"
+        xmlns:controls="using:Memorandum.Desktop.Controls"
         x:Class="Memorandum.Desktop.Views.DeadlineReminderWindow"
         Title="Дедлайн заметки"
         Width="400"
         Height="180"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource AppBackground}"
         Topmost="True">
-  <Border Padding="24" BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,0,0,4">
-    <StackPanel Spacing="16">
-      <TextBlock x:Name="TitleLabel" Text="Дедлайн наступил" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
-      <TextBlock x:Name="NoteTitleText" Text="" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" />
-      <TextBlock x:Name="DeadlineTimeText" Text="" FontSize="14" Foreground="{StaticResource GraphLabelSecondary}" />
-      <Button Content="OK" Classes="PrimaryButton" HorizontalAlignment="Right" Click="OnOkClick" />
-    </StackPanel>
-  </Border>
-</Window>
+  <controls:DialogChrome Title="Дедлайн заметки">
+    <Border Padding="24" BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,0,0,4">
+      <StackPanel Spacing="16">
+        <TextBlock x:Name="TitleLabel" Text="Дедлайн наступил" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
+        <TextBlock x:Name="NoteTitleText" Text="" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" />
+        <TextBlock x:Name="DeadlineTimeText" Text="" FontSize="14" Foreground="{StaticResource GraphLabelSecondary}" />
+        <Button Content="OK" Classes="PrimaryButton" HorizontalAlignment="Right" Click="OnOkClick" />
+      </StackPanel>
+    </Border>
+  </controls:DialogChrome>
+</local:MemorandumDialogWindow>

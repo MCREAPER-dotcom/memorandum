@@ -1,13 +1,17 @@
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Memorandum.Desktop;
 using Memorandum.Desktop.Models;
 using Memorandum.Desktop.Services;
 using Memorandum.Desktop.Themes;
@@ -15,21 +19,16 @@ using NAudio.Wave;
 
 namespace Memorandum.Desktop.Views;
 
-public partial class StickerWindow : Window
+public partial class StickerWindow : Window, IContentBlockRemover
 {
-    private static readonly Regex UrlRegex = new(@"https?://[^\s<>""]+|www\.[^\s<>""]+", RegexOptions.Compiled);
     private DispatcherTimer? _countdownTimer;
     private int _remainingSeconds;
     private readonly bool _closeOnTimerEnd;
     private int _transparencyPercent;
-    private string _currentContent = "";
+    private string _displayContent = "";
+    private string _editPreview = "";
     private string? _backgroundColorHex;
-    private List<string> _editModeAttachmentTokens = new();
-
-    private const string AttachmentPlaceholder = "[— вложение —]";
-    private static readonly Regex AttachmentBlockRegex = new(
-        @"\[Файл:\s*[^\]]*\]|\[Изображение:\s*[^\]]*\]|\[Папка:\s*[^\]]*\]",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    private bool _isClickThroughMode;
 
     public Action<string>? OnContentSaved { get; set; }
 
@@ -38,11 +37,62 @@ public partial class StickerWindow : Window
         InitializeComponent();
         _transparencyPercent = 100;
         ApplyCachedIcon();
+        DragDrop.SetAllowDrop(StickerEditDropZone, true);
+        DragDrop.SetAllowDrop(EditPanel, true);
+        StickerEditDropZone.AddHandler(DragDrop.DragOverEvent, OnStickerDragOver);
+        StickerEditDropZone.AddHandler(DragDrop.DropEvent, OnStickerDrop);
+        StickerEditDropZone.PointerPressed += OnStickerDropZonePointerPressed;
+        EditPanel.AddHandler(DragDrop.DragOverEvent, OnStickerDragOver);
+        EditPanel.AddHandler(DragDrop.DropEvent, OnStickerDrop);
+        Opened += OnStickerOpened;
         Closed += (_, _) =>
         {
             _countdownTimer?.Stop();
             _countdownTimer = null;
         };
+    }
+
+    private void OnStickerOpened(object? sender, EventArgs e)
+    {
+        LoadClipIcon();
+        UpdateClipButtonVisual();
+        if (_isClickThroughMode)
+            ApplyClickThroughMode();
+    }
+
+    private void LoadClipIcon()
+    {
+        if (ClipButtonIcon == null) return;
+        if (Application.Current?.Resources.TryGetResource("ClipIcon", null, out var icon) == true && icon is Avalonia.Media.IImage img)
+            ClipButtonIcon.Source = img;
+    }
+
+    private void OnClipButtonClick(object? sender, RoutedEventArgs e)
+    {
+        _isClickThroughMode = !_isClickThroughMode;
+        ApplyClickThroughMode();
+        UpdateClipButtonVisual();
+    }
+
+    private void UpdateClipButtonVisual()
+    {
+        if (ClipButton == null) return;
+        if (_isClickThroughMode)
+        {
+            ClipButton.Background = new SolidColorBrush(Color.FromArgb(220, 100, 140, 200));
+            ClipButton.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 80, 120, 180));
+        }
+        else
+        {
+            ClipButton.Background = Brushes.Transparent;
+            ClipButton.BorderBrush = new SolidColorBrush(Color.FromArgb(180, 160, 160, 160));
+        }
+    }
+
+    private void ApplyClickThroughMode()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        TrySetClickThrough(_isClickThroughMode);
     }
 
     private void ApplyCachedIcon()
@@ -51,17 +101,18 @@ public partial class StickerWindow : Window
             Icon = AppIconCache.Icon;
     }
 
-    public StickerWindow(string title, string content, int? durationMinutes = null, string? backgroundColorHex = null,
+    public StickerWindow(string title, string contentForDisplay, string previewForEdit, int? durationMinutes = null, string? backgroundColorHex = null,
         int transparencyPercent = 100, bool isClickThrough = false, bool isPinned = true, bool closeOnTimerEnd = false, DateTime? deadline = null) : this()
     {
         _closeOnTimerEnd = closeOnTimerEnd;
         _transparencyPercent = Math.Clamp(transparencyPercent, 1, 100);
-        _currentContent = content ?? "";
+        _displayContent = contentForDisplay ?? "";
+        _editPreview = previewForEdit ?? "";
         _backgroundColorHex = backgroundColorHex;
         Title = title;
         Topmost = isPinned;
         Opacity = 1;
-        BuildContentWithLinks(_currentContent);
+        BuildContentWithLinks(_displayContent);
         ApplyBackgroundColor(backgroundColorHex);
         if (deadline.HasValue)
         {
@@ -69,7 +120,10 @@ public partial class StickerWindow : Window
             DeadlineText.IsVisible = true;
         }
         if (isClickThrough)
+        {
+            _isClickThroughMode = true;
             Opened += OnOpenedSetClickThrough;
+        }
         if (durationMinutes.HasValue && durationMinutes.Value > 0)
         {
             _remainingSeconds = durationMinutes.Value * 60;
@@ -87,7 +141,7 @@ public partial class StickerWindow : Window
     private void OnOpenedSetClickThrough(object? sender, EventArgs e)
     {
         Opened -= OnOpenedSetClickThrough;
-        TrySetClickThrough(true);
+        ApplyClickThroughMode();
     }
 
     private void TrySetClickThrough(bool enable)
@@ -205,153 +259,9 @@ public partial class StickerWindow : Window
         }
     }
 
-    private const int StickerImageMaxWidth = 240;
-    private const int StickerImageMaxHeight = 200;
-
     private void BuildContentWithLinks(string? content)
     {
-        ContentPanel.Children.Clear();
-        if (string.IsNullOrEmpty(content))
-            return;
-
-        var normalBrush = (Avalonia.Application.Current?.Resources?.TryGetResource("StickerForeground", null, out var n) == true && n is IBrush nb) ? nb : Brushes.Black;
-        var linkBrush = (Avalonia.Application.Current?.Resources?.TryGetResource("AccentBrush", null, out var a) == true && a is IBrush ab) ? ab : Brushes.Blue;
-
-        var blocks = ContentParser.Parse(content);
-        foreach (var block in blocks)
-        {
-            switch (block)
-            {
-                case TextContentBlock textBlock:
-                    if (IsSingleLineImagePath(textBlock.Text))
-                        AddImageOrFallback(ContentPanel, textBlock.Text.Trim(), normalBrush);
-                    else
-                        AddTextWithLinks(ContentPanel, textBlock.Text, normalBrush, linkBrush);
-                    break;
-                case FileContentBlock fileBlock:
-                    AddFileLink(ContentPanel, fileBlock.Path, normalBrush, linkBrush);
-                    break;
-                case ImageContentBlock imageBlock:
-                    AddImageOrFallback(ContentPanel, imageBlock.Path, normalBrush);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    private static bool IsSingleLineImagePath(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return false;
-        var t = text.Trim();
-        if (t.Contains('\n') || t.Contains('\r')) return false;
-        if (!File.Exists(t)) return false;
-        var ext = System.IO.Path.GetExtension(t);
-        return ext.Length > 1 && s_imageExtensions.Contains(ext.AsSpan(1).ToString(), StringComparer.OrdinalIgnoreCase);
-    }
-
-    private static readonly string[] s_imageExtensions = { "png", "jpg", "jpeg", "gif", "bmp", "webp" };
-
-    private static void AddTextWithLinks(Panel parent, string text, IBrush normalBrush, IBrush linkBrush)
-    {
-        var lines = text.Split('\n');
-        foreach (var line in lines)
-        {
-            var linePanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 0 };
-            var lastIndex = 0;
-            foreach (Match m in UrlRegex.Matches(line))
-            {
-                if (m.Index > lastIndex)
-                {
-                    linePanel.Children.Add(new TextBlock
-                    {
-                        Text = line[lastIndex..m.Index],
-                        FontSize = 14,
-                        Foreground = normalBrush,
-                        TextWrapping = TextWrapping.Wrap
-                    });
-                }
-                var url = m.Value.StartsWith("www.", StringComparison.OrdinalIgnoreCase) ? "https://" + m.Value : m.Value;
-                var linkBlock = new TextBlock
-                {
-                    Text = m.Value,
-                    FontSize = 14,
-                    Foreground = linkBrush,
-                    TextDecorations = TextDecorations.Underline,
-                    Cursor = new Cursor(StandardCursorType.Hand),
-                    TextWrapping = TextWrapping.Wrap
-                };
-                linkBlock.PointerPressed += (_, e) =>
-                {
-                    e.Handled = true;
-                    try { Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true }); } catch { }
-                };
-                linePanel.Children.Add(linkBlock);
-                lastIndex = m.Index + m.Length;
-            }
-            if (lastIndex < line.Length)
-                linePanel.Children.Add(new TextBlock
-                {
-                    Text = line[lastIndex..],
-                    FontSize = 14,
-                    Foreground = normalBrush,
-                    TextWrapping = TextWrapping.Wrap
-                });
-            parent.Children.Add(linePanel);
-        }
-    }
-
-    private static void AddFileLink(Panel parent, string path, IBrush normalBrush, IBrush linkBrush)
-    {
-        var name = System.IO.Path.GetFileName(path.Trim());
-        var block = new TextBlock
-        {
-            Text = string.IsNullOrEmpty(name) ? path : name,
-            FontSize = 14,
-            Foreground = linkBrush,
-            TextDecorations = TextDecorations.Underline,
-            Cursor = new Cursor(StandardCursorType.Hand),
-            TextWrapping = TextWrapping.Wrap
-        };
-        block.PointerPressed += (_, e) =>
-        {
-            e.Handled = true;
-            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path.Trim()))
-            {
-                try { Process.Start(new ProcessStartInfo { FileName = path.Trim(), UseShellExecute = true }); } catch { }
-            }
-        };
-        parent.Children.Add(block);
-    }
-
-    private void AddImageOrFallback(Panel parent, string path, IBrush normalBrush)
-    {
-        var trimmed = path.Trim();
-        if (string.IsNullOrWhiteSpace(trimmed))
-            return;
-
-        if (!File.Exists(trimmed))
-        {
-            parent.Children.Add(new TextBlock { Text = trimmed, FontSize = 14, Foreground = normalBrush, TextWrapping = TextWrapping.Wrap });
-            return;
-        }
-
-        try
-        {
-            var bitmap = new Bitmap(trimmed);
-            var image = new Avalonia.Controls.Image
-            {
-                Source = bitmap,
-                MaxWidth = StickerImageMaxWidth,
-                MaxHeight = StickerImageMaxHeight,
-                Stretch = Stretch.Uniform
-            };
-            parent.Children.Add(image);
-        }
-        catch
-        {
-            parent.Children.Add(new TextBlock { Text = trimmed, FontSize = 14, Foreground = normalBrush, TextWrapping = TextWrapping.Wrap });
-        }
+        ContentBlocksControl.ItemsSource = ContentParser.Parse(content ?? "");
     }
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -360,12 +270,31 @@ public partial class StickerWindow : Window
             BeginMoveDrag(e);
     }
 
+    private void OnResizeNorth(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.North, e);
+    private void OnResizeSouth(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.South, e);
+    private void OnResizeWest(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.West, e);
+    private void OnResizeEast(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.East, e);
+    private void OnResizeNorthWest(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthWest, e);
+    private void OnResizeNorthEast(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.NorthEast, e);
+    private void OnResizeSouthWest(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthWest, e);
+    private void OnResizeSouthEast(object? sender, PointerPressedEventArgs e) => BeginResizeDrag(WindowEdge.SouthEast, e);
+
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.H && (e.KeyModifiers & KeyModifiers.Control) != 0)
         {
-            e.Handled = true;
-            Hide();
+            if ((e.KeyModifiers & KeyModifiers.Shift) != 0)
+            {
+                _isClickThroughMode = !_isClickThroughMode;
+                ApplyClickThroughMode();
+                UpdateClipButtonVisual();
+                e.Handled = true;
+            }
+            else
+            {
+                e.Handled = true;
+                Hide();
+            }
         }
     }
 
@@ -374,39 +303,78 @@ public partial class StickerWindow : Window
         Opacity = 1;
         ApplyBackgroundColorSolid(_backgroundColorHex);
         ViewScroll.IsVisible = false;
-        ContentPanel.IsVisible = false;
         EditPanel.IsVisible = true;
-        var (textForEditing, tokens) = GetContentForEditing(_currentContent);
-        _editModeAttachmentTokens = tokens;
-        EditContentBox.Text = textForEditing;
+        EditContentBlocksControl.ItemsSource = ContentParser.Parse(_displayContent ?? "");
+        EditContentBox.Text = _editPreview ?? "";
         EditContentBox.Focus();
         EditModeButton.IsVisible = false;
         EditButtonsPanel.IsVisible = true;
     }
 
-    private static (string textForEditing, List<string> attachmentTokens) GetContentForEditing(string? content)
+    private void OnStickerDragOver(object? sender, DragEventArgs e)
     {
-        var tokens = new List<string>();
-        if (string.IsNullOrEmpty(content))
-            return ("", tokens);
-        var text = AttachmentBlockRegex.Replace(content, m =>
-        {
-            tokens.Add(m.Value);
-            return AttachmentPlaceholder;
-        });
-        return (text, tokens);
+        if (e.Data?.GetFiles()?.Any() == true)
+            e.DragEffects = DragDropEffects.Copy;
     }
 
-    private static string RestoreContentWithAttachments(string editedText, List<string> attachmentTokens)
+    private void OnStickerDrop(object? sender, DragEventArgs e)
     {
-        var result = editedText ?? "";
-        foreach (var token in attachmentTokens)
+        var files = e.Data?.GetFiles();
+        if (files == null) return;
+        var paths = files.Select(f => f.TryGetLocalPath()).Where(p => !string.IsNullOrEmpty(p)).Select(p => p!).ToList();
+        var content = ContentInsertionService.ProcessDroppedPaths(paths);
+        if (!string.IsNullOrEmpty(content))
         {
-            var idx = result.IndexOf(AttachmentPlaceholder, StringComparison.Ordinal);
-            if (idx < 0) break;
-            result = result.Substring(0, idx) + token + result.Substring(idx + AttachmentPlaceholder.Length);
+            AppendToEditContent(content);
+            e.Handled = true;
         }
-        return result;
+    }
+
+    private void OnStickerDropZonePointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        _ = StickerPasteFromClipboardAsync();
+    }
+
+    private void OnStickerPasteFromClipboardClick(object? sender, RoutedEventArgs e)
+    {
+        _ = StickerPasteFromClipboardAsync();
+    }
+
+    private async Task StickerPasteFromClipboardAsync()
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        var clipboard = topLevel?.Clipboard;
+        if (clipboard == null && Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            clipboard = desktop.MainWindow?.Clipboard;
+        var handle = topLevel?.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
+        Func<Task<string?>>? getText = clipboard != null ? (async () => await clipboard.GetTextAsync()) : null;
+        var content = await ContentInsertionService.GetPastedContentAsync(getText, handle);
+        if (!string.IsNullOrEmpty(content))
+            AppendToEditContent(content);
+    }
+
+    private void AppendToEditContent(string text)
+    {
+        var box = EditContentBox;
+        var current = box.Text ?? "";
+        var start = Math.Clamp(box.SelectionStart, 0, current.Length);
+        var end = Math.Clamp(box.SelectionEnd, 0, current.Length);
+        var before = current.Substring(0, start);
+        var after = current.Substring(end);
+        box.Text = before + text + after;
+        box.SelectionStart = box.SelectionEnd = start + text.Length;
+    }
+
+    public void RemoveBlock(ContentBlockItem block)
+    {
+        var marker = block is FileContentBlock f ? f.GetMarkerToRemove()
+            : block is ImageContentBlock i ? i.GetMarkerToRemove()
+            : null;
+        if (string.IsNullOrEmpty(marker)) return;
+        var idx = _displayContent.IndexOf(marker);
+        if (idx < 0) return;
+        _displayContent = _displayContent.Remove(idx, marker.Length);
+        EditContentBlocksControl.ItemsSource = ContentParser.Parse(_displayContent);
     }
 
     private void ApplyBackgroundColorSolid(string? hex)
@@ -439,16 +407,13 @@ public partial class StickerWindow : Window
 
     private void OnSaveClick(object? sender, RoutedEventArgs e)
     {
-        var editedText = EditContentBox.Text ?? "";
-        _currentContent = RestoreContentWithAttachments(editedText, _editModeAttachmentTokens);
-        _editModeAttachmentTokens.Clear();
-        OnContentSaved?.Invoke(_currentContent);
+        _editPreview = EditContentBox.Text ?? "";
+        OnContentSaved?.Invoke(_editPreview);
         ShowViewMode();
     }
 
     private void OnCancelEditClick(object? sender, RoutedEventArgs e)
     {
-        _editModeAttachmentTokens.Clear();
         ShowViewMode();
     }
 
@@ -456,8 +421,7 @@ public partial class StickerWindow : Window
     {
         EditPanel.IsVisible = false;
         ViewScroll.IsVisible = true;
-        ContentPanel.IsVisible = true;
-        BuildContentWithLinks(_currentContent);
+        BuildContentWithLinks(_displayContent);
         EditButtonsPanel.IsVisible = false;
         EditModeButton.IsVisible = true;
         ApplyBackgroundColor(_backgroundColorHex);

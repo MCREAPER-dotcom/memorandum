@@ -1,14 +1,15 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="using:Memorandum.Desktop.Resources"
         x:Class="Memorandum.Desktop.Views.StickerWindow"
         Title=""
-        Width="280"
-        Height="200"
-        MinWidth="220"
-        MinHeight="160"
+        Width="380"
+        Height="320"
+        MinWidth="280"
+        MinHeight="220"
         SystemDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaChromeHints="SystemChrome"
         Background="{StaticResource StickerBackground}"
         CanResize="True"
         KeyDown="OnKeyDown">
@@ -16,27 +17,69 @@
           Background="{StaticResource StickerBackground}"
           PointerPressed="OnPointerPressed">
     <Grid RowDefinitions="Auto,*,Auto">
+      <Border Grid.Row="0" Grid.RowSpan="3" Background="Transparent" ZIndex="1000" IsHitTestVisible="True">
+        <Grid RowDefinitions="4,*,4" ColumnDefinitions="4,*,4">
+          <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="4" Cursor="SizeNorthSouth" PointerPressed="OnResizeNorth" />
+          <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="4" Cursor="SizeNorthSouth" PointerPressed="OnResizeSouth" />
+          <Border Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Width="4" Cursor="SizeWestEast" PointerPressed="OnResizeWest" />
+          <Border Grid.Row="0" Grid.RowSpan="3" Grid.Column="2" Width="4" Cursor="SizeWestEast" PointerPressed="OnResizeEast" />
+          <Border Grid.Row="0" Grid.Column="0" Width="8" Height="8" Cursor="TopLeftCorner" PointerPressed="OnResizeNorthWest" />
+          <Border Grid.Row="0" Grid.Column="2" Width="8" Height="8" HorizontalAlignment="Right" Cursor="TopRightCorner" PointerPressed="OnResizeNorthEast" />
+          <Border Grid.Row="2" Grid.Column="0" Width="8" Height="8" VerticalAlignment="Bottom" Cursor="BottomLeftCorner" PointerPressed="OnResizeSouthWest" />
+          <Border Grid.Row="2" Grid.Column="2" Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner" PointerPressed="OnResizeSouthEast" />
+        </Grid>
+      </Border>
       <Border Grid.Row="0" Padding="12,8" Background="Transparent" Cursor="SizeAll">
         <Grid RowDefinitions="Auto,Auto">
-          <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+          <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto">
             <TextBlock x:Name="TimerText" Text="00:00" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource StickerForeground}" VerticalAlignment="Center" />
-            <Button x:Name="EditModeButton" Grid.Column="1" Content="Редактировать" Padding="8,4" FontSize="12"
+            <Button x:Name="ClipButton" Grid.Column="1" Padding="6" MinWidth="36" MinHeight="36" Margin="0,0,4,0"
+                    Background="Transparent" BorderThickness="1" Cursor="Hand" ToolTip.Tip="Сквозные клики (вкл/выкл)"
+                    Click="OnClipButtonClick">
+              <Image x:Name="ClipButtonIcon" Width="20" Height="20" />
+            </Button>
+            <Button x:Name="EditModeButton" Grid.Column="2" Content="Редактировать" Padding="8,4" FontSize="12"
                     Background="#F0F0F0" Foreground="#1a1a1a" BorderThickness="0" Cursor="Hand"
                     Click="OnEditModeClick" />
           </Grid>
           <TextBlock x:Name="DeadlineText" Grid.Row="1" Text="" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource StickerForeground}" Margin="0,4,0,0" IsVisible="False" />
         </Grid>
       </Border>
-      <ScrollViewer x:Name="ViewScroll" Grid.Row="1" Margin="12,0" VerticalScrollBarVisibility="Auto">
-        <StackPanel x:Name="ContentPanel" Spacing="4" />
+      <ScrollViewer x:Name="ViewScroll" Grid.Row="1" Margin="12,0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Focusable="True" MaxWidth="356" AllowAutoHide="False">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+          <ItemsControl x:Name="ContentBlocksControl" ItemTemplate="{StaticResource ContentBlockTemplateSelector}" HorizontalAlignment="Left">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </StackPanel>
       </ScrollViewer>
-      <Grid x:Name="EditPanel" Grid.Row="1" Margin="12,0" IsVisible="False">
-        <TextBox x:Name="EditContentBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"
+      <Grid x:Name="EditPanel" Grid.Row="1" Margin="12,0" IsVisible="False" RowDefinitions="Auto,Auto,Auto,*">
+        <ScrollViewer Grid.Row="0" MaxHeight="140" MaxWidth="356" Margin="0,0,0,8" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Focusable="True" AllowAutoHide="False">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+            <ItemsControl x:Name="EditContentBlocksControl" ItemTemplate="{StaticResource ContentBlockTemplateSelector}" HorizontalAlignment="Left">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+        <Border x:Name="StickerEditDropZone" Grid.Row="1" Margin="0,0,0,8" Padding="12,10" Background="#E8E8E8" CornerRadius="6" Cursor="Hand" MinHeight="52">
+          <StackPanel Orientation="Vertical" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="{x:Static res:UiStrings.LoadImageOrPaste}" FontSize="12" Foreground="#1a1a1a" TextWrapping="Wrap" TextAlignment="Center" IsHitTestVisible="False" MaxWidth="240" />
+            <Button x:Name="StickerPasteFromClipboardButton" Content="{x:Static res:UiStrings.PasteFromClipboard}" FontSize="12" Padding="8,4" Background="#D0D0D0" Foreground="#1a1a1a" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Center" Click="OnStickerPasteFromClipboardClick" />
+          </StackPanel>
+        </Border>
+        <TextBox x:Name="EditContentBox" Grid.Row="3" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60"
                  Background="#F8F8F8" Foreground="#1a1a1a" Watermark="Текст заметки..." />
       </Grid>
       <Border Grid.Row="2" Padding="12,8" BorderBrush="{StaticResource StickerHintForeground}" BorderThickness="0,1,0,0">
         <Grid ColumnDefinitions="*,Auto" x:Name="FooterPanel">
-          <TextBlock Grid.Column="0" Text="Нажмите Ctrl+H для скрытия • Перетаскивайте для перемещения"
+          <TextBlock Grid.Column="0" Text="Ctrl+H скрыть • Ctrl+Shift+H сквозные клики • Перетаскивайте для перемещения"
                      FontSize="11" Foreground="{StaticResource StickerHintForeground}" TextWrapping="Wrap" />
           <StackPanel x:Name="EditButtonsPanel" Grid.Column="1" Orientation="Horizontal" Spacing="8" IsVisible="False">
             <Button x:Name="SaveButton" Content="Сохранить" Padding="8,4" FontSize="12" Background="#2d7d2d" Foreground="White" BorderThickness="0" Cursor="Hand" Click="OnSaveClick" />

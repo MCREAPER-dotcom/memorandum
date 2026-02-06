@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Memorandum.Desktop.Controls.ContentBlocksCarousel"
+             MinHeight="160">
+  <Grid RowDefinitions="Auto,Auto">
+    <Border x:Name="ContentHost" Grid.Row="0" MinHeight="140" MaxHeight="180" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <StackPanel x:Name="DotsPanel" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0" Spacing="6" IsVisible="False" />
+  </Grid>
+</UserControl>

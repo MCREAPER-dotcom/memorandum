@@ -1,13 +1,13 @@
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
+using Memorandum.Desktop;
 using Memorandum.Desktop.Services;
 using IModalOverlayHost = Memorandum.Desktop.IModalOverlayHost;
 
 namespace Memorandum.Desktop.Views;
 
-public partial class SubfolderNameDialog : Window
+public partial class SubfolderNameDialog : MemorandumDialogWindow
 {
     private TaskCompletionSource<string?>? _tcs;
     private Window? _modalOwner;
@@ -15,7 +15,6 @@ public partial class SubfolderNameDialog : Window
     public SubfolderNameDialog()
     {
         InitializeComponent();
-        ApplyCachedIcon();
         Closed += (_, _) =>
         {
             _tcs?.TrySetResult(null);
@@ -29,40 +28,6 @@ public partial class SubfolderNameDialog : Window
             }
         };
     }
-
-    private void ApplyCachedIcon()
-    {
-        if (AppIconCache.Icon == null)
-            return;
-        Icon = AppIconCache.Icon;
-        if (TitleBarIcon != null && AppIconCache.Bitmap != null)
-        {
-            TitleBarIcon.Source = AppIconCache.Bitmap;
-            TitleBarIcon.IsVisible = true;
-        }
-    }
-
-    private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            return;
-        var src = e.Source as Control;
-        while (src != null)
-        {
-            if (src is Button || src is TextBox)
-                return;
-            src = src.Parent as Control;
-        }
-        BeginMoveDrag(e);
-    }
-
-    private void OnMinimizeClick(object? sender, RoutedEventArgs e) =>
-        WindowState = WindowState.Minimized;
-
-    private void OnMaximizeClick(object? sender, RoutedEventArgs e) =>
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-
-    private void OnCloseClick(object? sender, RoutedEventArgs e) => CompleteWithResult(null);
 
     public string? Result { get; private set; }
 
@@ -96,8 +61,6 @@ public partial class SubfolderNameDialog : Window
     public void ResetForShow(string title)
     {
         Title = title;
-        if (TitleBarTitle != null)
-            TitleBarTitle.Text = title;
         NameBox.Text = "";
     }
 

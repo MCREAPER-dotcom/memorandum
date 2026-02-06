@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Memorandum.Desktop.Models;
+using Memorandum.Desktop.Resources;
 using Memorandum.Desktop.Services;
 
 namespace Memorandum.Desktop.Views;
@@ -22,6 +23,7 @@ public partial class SettingsView : UserControl
         InitializeComponent();
         ManagementTab.Classes.Add("Selected");
         LoadHotkeys();
+        LoadAppSettings();
         BuildHotkeyPanel();
     }
 
@@ -31,6 +33,30 @@ public partial class SettingsView : UserControl
     private void LoadHotkeys()
     {
         _hotkeyItems = HotkeyConfigStorage.Load().ToList();
+    }
+
+    private void LoadAppSettings()
+    {
+        var s = AppSettingsStorage.Load();
+        NotificationSoundBox.Text = s.NotificationSoundPath ?? "";
+        BackupPathBox.Text = s.BackupPath ?? "";
+        RunAtStartupCheck.IsChecked = s.RunAtStartup;
+        MinimizeToTrayCheck.IsChecked = s.MinimizeToTray;
+        StickerAnimationCheck.IsChecked = s.StickerAnimation;
+    }
+
+    private void SaveAppSettings()
+    {
+        var soundPath = (NotificationSoundBox.Text ?? "").Trim();
+        var s = new AppSettingsDto
+        {
+            NotificationSoundPath = string.IsNullOrEmpty(soundPath) ? "notification.mp3" : soundPath,
+            BackupPath = (BackupPathBox.Text ?? "").Trim(),
+            RunAtStartup = RunAtStartupCheck.IsChecked == true,
+            MinimizeToTray = MinimizeToTrayCheck.IsChecked == true,
+            StickerAnimation = StickerAnimationCheck.IsChecked != false
+        };
+        AppSettingsStorage.Save(s);
     }
 
     private void BuildHotkeyPanel()
@@ -80,7 +106,7 @@ public partial class SettingsView : UserControl
     private void StartRecording(int index, TextBlock comboTextBlock)
     {
         _recordingIndex = index;
-        comboTextBlock.Text = "Нажмите сочетание...";
+        comboTextBlock.Text = UiStrings.HotkeyPressPrompt;
         HotkeyConflictWarning.IsVisible = false;
         AddHandler(KeyDownEvent, OnWindowKeyDownForCapture, RoutingStrategies.Bubble);
     }
@@ -130,6 +156,7 @@ public partial class SettingsView : UserControl
     private void OnSaveClick(object? sender, RoutedEventArgs e)
     {
         HotkeyConfigStorage.Save(_hotkeyItems);
+        SaveAppSettings();
         OnHotkeysSaved?.Invoke();
         OnBack?.Invoke();
     }

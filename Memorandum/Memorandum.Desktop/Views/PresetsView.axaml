@@ -1,35 +1,36 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="using:Memorandum.Desktop.Resources"
              x:Class="Memorandum.Desktop.Views.PresetsView"
              Background="{StaticResource AppBackground}">
   <Grid RowDefinitions="Auto,*">
     <Border Grid.Row="0" Classes="AppHeader">
       <Grid ColumnDefinitions="Auto,*,Auto">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <Button x:Name="BackButton" Content="Назад" Classes="SecondaryButton" Click="OnBackClick" />
-          <TextBlock Text="Пресеты" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
+          <Button x:Name="BackButton" Content="{x:Static res:UiStrings.Back}" Classes="SecondaryButton" Click="OnBackClick" />
+          <TextBlock Text="{x:Static res:UiStrings.PresetsTitle}" Classes="PageTitle" VerticalAlignment="Center" />
         </StackPanel>
         <Panel Grid.Column="1" />
-        <Button Grid.Column="2" x:Name="CreatePresetButton" Content="+ Создать пресет" Classes="PrimaryButton" Click="OnCreatePresetClick" />
+        <Button Grid.Column="2" x:Name="CreatePresetButton" Content="{x:Static res:UiStrings.CreatePreset}" Classes="PrimaryButton" Click="OnCreatePresetClick" />
       </Grid>
     </Border>
     <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-      <Border Grid.Column="0" Width="280" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="0,0,1,0" Padding="16">
+      <Border Grid.Column="0" Width="260" Background="{StaticResource SurfaceBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="0,0,1,0" Padding="10,12">
         <ScrollViewer>
           <StackPanel Spacing="0">
-            <TextBlock Text="Доступные пресеты" Foreground="{StaticResource GraphLabelSecondary}" FontSize="12" Margin="0,0,0,12" />
+            <TextBlock Text="{x:Static res:UiStrings.AvailablePresets}" Classes="StaticLabelSmall" Margin="0,0,0,8" />
             <ListBox x:Name="PresetsList" Background="Transparent" BorderThickness="0" SelectionChanged="OnPresetSelectionChanged">
               <ListBox.ItemTemplate>
                 <DataTemplate>
-                  <Border Margin="0,0,0,8" Padding="12" Background="{StaticResource GraphPanelBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="8">
+                  <Border Margin="0,0,0,6" Padding="10,8" Background="{StaticResource GraphPanelBackground}" BorderBrush="{StaticResource GraphBorderBrush}" BorderThickness="1" CornerRadius="6" Cursor="Hand">
                     <Grid RowDefinitions="Auto,Auto,Auto">
                       <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" />
-                        <Border Grid.Column="1" Width="16" Height="16" CornerRadius="2" Background="{Binding ColorBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <Border Grid.Column="1" Width="12" Height="12" CornerRadius="2" Background="{Binding ColorBrush}" VerticalAlignment="Center" Margin="4,0,0,0" />
                       </Grid>
-                      <TextBlock Grid.Row="1" Text="{Binding Details}" FontSize="12" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,4,0,0" />
-                      <Border Grid.Row="2" Margin="0,6,0,0" Padding="6,2" CornerRadius="4" HorizontalAlignment="Left" Background="{Binding TypeBackground}">
-                        <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{StaticResource PrimaryForeground}" />
+                      <TextBlock Grid.Row="1" Text="{Binding Details}" FontSize="11" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
+                      <Border Grid.Row="2" Margin="0,4,0,0" Padding="4,2" CornerRadius="4" HorizontalAlignment="Left" Background="{Binding TypeBackground}">
+                        <TextBlock Text="{Binding TypeLabel}" FontSize="10" Foreground="{StaticResource PrimaryForeground}" />
                       </Border>
                     </Grid>
                   </Border>
@@ -39,56 +40,100 @@
           </StackPanel>
         </ScrollViewer>
       </Border>
-      <Border Grid.Column="1" Background="{StaticResource AppBackground}" Padding="48">
-        <ScrollViewer>
-          <StackPanel Spacing="24" MaxWidth="400">
-            <StackPanel x:Name="PlaceholderPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
-              <TextBlock Text="Выберите пресет для просмотра деталей или создайте новый" FontSize="16" Foreground="{StaticResource GraphLabelSecondary}" TextWrapping="Wrap" TextAlignment="Center" />
-            </StackPanel>
-            <StackPanel x:Name="DetailPanel" IsVisible="False" Spacing="20">
-              <TextBlock x:Name="DetailTitle" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
-              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Прозрачность:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
-                <TextBlock x:Name="DetailTransparency" Grid.Row="0" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Длительность:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
-                <TextBlock x:Name="DetailDuration" Grid.Row="1" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Тип:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
-                <TextBlock x:Name="DetailType" Grid.Row="2" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" />
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Тег(и):" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,8" />
-                <TextBlock x:Name="DetailTags" Grid.Row="3" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" Margin="0,0,0,8" TextWrapping="Wrap" />
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Цвет:" Foreground="{StaticResource GraphLabelSecondary}" Margin="0,0,12,0" />
-                <Border x:Name="DetailColorSwatch" Grid.Row="4" Grid.Column="1" Width="24" Height="24" CornerRadius="4" />
+      <Border Grid.Column="1" Background="{StaticResource AppBackground}" Padding="40,32">
+        <Grid VerticalAlignment="Stretch">
+          <ScrollViewer VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch">
+            <StackPanel Spacing="28" MaxWidth="900" HorizontalAlignment="Stretch">
+              <StackPanel x:Name="PlaceholderPanel" HorizontalAlignment="Stretch" VerticalAlignment="Center" Spacing="20" MinHeight="500">
+                <TextBlock Text="{x:Static res:UiStrings.ChoosePresetPlaceholder}" Classes="PlaceholderLabel" FontSize="16" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="500" HorizontalAlignment="Center" />
+              </StackPanel>
+              <StackPanel x:Name="DetailPanel" IsVisible="False" Spacing="24">
+              <TextBlock x:Name="DetailTitle" Classes="PageTitle" Margin="0,0,0,16" />
+              <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+                <Border Grid.Row="0" Grid.Column="0" Classes="NoteEditCard" Padding="20" Margin="0,0,12,12">
+                  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static res:UiStrings.Transparency}" Classes="CardLabel" Margin="0,0,16,10" VerticalAlignment="Center" />
+                    <TextBlock x:Name="DetailTransparency" Grid.Row="0" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" FontSize="13" Margin="0,0,0,10" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static res:UiStrings.Duration}" Classes="CardLabel" Margin="0,0,16,10" VerticalAlignment="Center" />
+                    <TextBlock x:Name="DetailDuration" Grid.Row="1" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" FontSize="13" Margin="0,0,0,10" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static res:UiStrings.Type}" Classes="CardLabel" Margin="0,0,16,0" VerticalAlignment="Center" />
+                    <TextBlock x:Name="DetailType" Grid.Row="2" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}" FontSize="13" VerticalAlignment="Center" />
+                  </Grid>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" Classes="NoteEditCard" Padding="20" Margin="0,0,0,12">
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Static res:UiStrings.Folder}" Classes="CardLabel" />
+                    <TextBlock x:Name="DetailFolder" Foreground="{StaticResource PrimaryForeground}" FontSize="13" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" Classes="NoteEditCard" Padding="20" Margin="0,0,12,12">
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Static res:UiStrings.Tags}" Classes="CardLabel" />
+                    <TextBlock x:Name="DetailTags" Foreground="{StaticResource PrimaryForeground}" FontSize="13" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Classes="NoteEditCard" Padding="20" Margin="0,0,0,12">
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Static res:UiStrings.Color}" Classes="CardLabel" />
+                    <Border x:Name="DetailColorSwatch" Width="24" Height="24" CornerRadius="4" />
+                  </StackPanel>
+                </Border>
+                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                  <Button x:Name="ApplyPresetButton" Content="{x:Static res:UiStrings.ApplyPreset}" Classes="PrimaryButton" Click="OnApplyPresetClick" />
+                  <Button x:Name="EditPresetButton" Content="{x:Static res:UiStrings.Edit}" Classes="SecondaryButton" Click="OnEditPresetClick" />
+                  <Button x:Name="DeletePresetButton" Content="{x:Static res:UiStrings.Delete}" Background="{StaticResource TagPillRed}" Foreground="{StaticResource PrimaryForeground}" Click="OnDeletePresetClick" />
+                </StackPanel>
               </Grid>
-              <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
-                <Button x:Name="ApplyPresetButton" Content="Применить пресет" Classes="PrimaryButton" Click="OnApplyPresetClick" />
-                <Button x:Name="EditPresetButton" Content="Редактировать" Classes="SecondaryButton" Click="OnEditPresetClick" />
-                <Button x:Name="DeletePresetButton" Content="Удалить" Background="{StaticResource TagPillRed}" Foreground="{StaticResource PrimaryForeground}" Click="OnDeletePresetClick" />
-              </StackPanel>
             </StackPanel>
-            <StackPanel x:Name="FormPanel" Classes="PresetForm" IsVisible="False" Spacing="16">
-              <TextBlock x:Name="FormTitleLabel" Text="Новый пресет" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryForeground}" />
-              <TextBlock Text="Название:" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
-              <TextBox x:Name="FormTitleBox" Watermark="Название пресета" Classes="DarkInput" />
-              <TextBlock Text="Прозрачность (%):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
-              <TextBox x:Name="FormTransparencyBox" Watermark="95" Classes="DarkInput" />
-              <TextBlock Text="Длительность (мин, необязательно):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
-              <TextBox x:Name="FormDurationBox" Watermark="15" Classes="DarkInput" />
-              <TextBlock Text="Тип:" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
-              <StackPanel Orientation="Horizontal" Spacing="16">
-                <RadioButton x:Name="FormTypeSticker" Content="Стикер" GroupName="PresetType" />
-                <RadioButton x:Name="FormTypeRegular" Content="Обычная" GroupName="PresetType" IsChecked="True" />
-              </StackPanel>
-              <TextBlock Text="Тег(и), через запятую:" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
-              <TextBox x:Name="FormTagsBox" Watermark="важное, встреча" Classes="DarkInput" />
-              <TextBlock Text="Цвет (#hex):" Foreground="{StaticResource GraphLabelSecondary}" FontSize="13" />
-              <TextBox x:Name="FormColorBox" Watermark="#dc2626" Classes="DarkInput" />
-              <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button x:Name="FormSaveButton" Content="Сохранить" Classes="PrimaryButton" Click="OnFormSaveClick" />
-                <Button x:Name="FormCancelButton" Content="Отмена" Classes="SecondaryButton" Click="OnFormCancelClick" />
-              </StackPanel>
+            <StackPanel x:Name="FormPanel" Classes="PresetForm" IsVisible="False" Spacing="24">
+              <TextBlock x:Name="FormTitleLabel" Text="{x:Static res:UiStrings.NewPreset}" Classes="PageTitle" Margin="0,0,0,16" />
+              <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+                <Border Grid.Row="0" Grid.Column="0" Classes="NoteEditCard" Padding="20" Margin="0,0,12,12">
+                  <StackPanel Spacing="14">
+                    <TextBlock Text="{x:Static res:UiStrings.Name}" Classes="CardLabel" />
+                    <TextBox x:Name="FormTitleBox" Watermark="{x:Static res:UiStrings.PresetNameWatermark}" Classes="DarkInput" MinHeight="40" Padding="12,10" />
+                    <TextBlock Text="{x:Static res:UiStrings.TransparencyPercent}" Classes="CardLabel" Margin="0,4,0,0" />
+                    <TextBox x:Name="FormTransparencyBox" Watermark="{x:Static res:UiStrings.PresetTransparencyWatermark}" Classes="DarkInput" MinHeight="40" Padding="12,10" />
+                    <TextBlock Text="{x:Static res:UiStrings.DurationMinOptional}" Classes="CardLabel" Margin="0,4,0,0" />
+                    <TextBox x:Name="FormDurationBox" Watermark="{x:Static res:UiStrings.PresetDurationWatermark}" Classes="DarkInput" MinHeight="40" Padding="12,10" />
+                    <TextBlock Text="{x:Static res:UiStrings.Type}" Classes="CardLabel" Margin="0,4,0,0" />
+                    <StackPanel Orientation="Horizontal" Spacing="24" Margin="0,4,0,0">
+                      <RadioButton x:Name="FormTypeSticker" Content="{x:Static res:UiStrings.Sticker}" GroupName="PresetType" />
+                      <RadioButton x:Name="FormTypeRegular" Content="{x:Static res:UiStrings.Regular}" GroupName="PresetType" IsChecked="True" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" Classes="NoteEditCard" Padding="20" Margin="0,0,0,12">
+                  <StackPanel Spacing="14">
+                    <TextBlock Text="{x:Static res:UiStrings.Folder}" Classes="CardLabel" />
+                    <Button x:Name="FormAddFolderButton" Content="{x:Static res:UiStrings.AddFolder}" Classes="GraphLinkButton" HorizontalAlignment="Left" Click="OnFormAddFolderClick" Padding="0,6" />
+                    <ScrollViewer MaxHeight="200" HorizontalScrollBarVisibility="Auto" Margin="0,4,0,0">
+                      <StackPanel x:Name="FormFolderPanel" Spacing="4" />
+                    </ScrollViewer>
+                  </StackPanel>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" Classes="NoteEditCard" Padding="20" Margin="0,0,12,12">
+                  <StackPanel Spacing="14">
+                    <TextBlock Text="{x:Static res:UiStrings.Tags}" Classes="CardLabel" />
+                    <WrapPanel x:Name="FormTagsWrap" Orientation="Horizontal" />
+                    <Button Content="{x:Static res:UiStrings.CreateTag}" Classes="GraphLinkButton" HorizontalAlignment="Left" Click="OnFormCreateTagClick" Padding="0,6" />
+                  </StackPanel>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Classes="NoteEditCard" Padding="20" Margin="0,0,0,12">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="{x:Static res:UiStrings.ColorHex}" Classes="CardLabel" />
+                    <TextBox x:Name="FormColorBox" Watermark="{x:Static res:UiStrings.PresetColorWatermark}" Classes="DarkInput" MinHeight="40" Padding="12,10" />
+                  </StackPanel>
+                </Border>
+                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                  <Button x:Name="FormSaveButton" Content="{x:Static res:UiStrings.Save}" Classes="PrimaryButton" Click="OnFormSaveClick" Padding="24,12" />
+                  <Button x:Name="FormCancelButton" Content="{x:Static res:UiStrings.Cancel}" Classes="SecondaryButton" Click="OnFormCancelClick" Padding="24,12" />
+                </StackPanel>
+              </Grid>
             </StackPanel>
           </StackPanel>
         </ScrollViewer>
+        </Grid>
       </Border>
     </Grid>
   </Grid>

@@ -4,14 +4,20 @@
   <Style Selector="ScrollBar">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="Transparent" />
-    <Setter Property="Width" Value="16" />
-    <Setter Property="MinWidth" Value="16" />
   </Style>
   <Style Selector="ScrollBar:vertical">
     <Setter Property="Width" Value="16" />
+    <Setter Property="MinWidth" Value="16" />
   </Style>
+  <!-- Горизонтальная полоса: по высоте 16px, по ширине тянется по треку (Width не задаём) -->
   <Style Selector="ScrollBar:horizontal">
     <Setter Property="Height" Value="16" />
+    <Setter Property="MinHeight" Value="16" />
+  </Style>
+  <!-- Горизонтальный ползунок: ширина минимум 48px, высота по полосе (не квадрат) -->
+  <Style Selector="ScrollBar[Orientation=Horizontal] /template/ Thumb">
+    <Setter Property="MinHeight" Value="8" />
+    <Setter Property="MinWidth" Value="48" />
   </Style>
   <!-- Трек без фона: в Fluent трек рисует Rectangle#TrackRect -->
   <Style Selector="ScrollBar /template/ Border">
@@ -37,7 +43,7 @@
   <!-- Ползунок неактивен — приглушённый фиолетовый -->
   <Style Selector="ScrollBar /template/ Thumb">
     <Setter Property="Background" Value="{StaticResource ScrollBarTrackBrush}" />
-    <Setter Property="MinWidth" Value="12" />
+    <Setter Property="MinWidth" Value="48" />
     <Setter Property="MinHeight" Value="32" />
     <Setter Property="CornerRadius" Value="8" />
   </Style>

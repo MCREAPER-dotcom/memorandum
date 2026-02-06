@@ -25,7 +25,7 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
     public IReadOnlyList<GraphNode> GetNodes()
     {
         var notes = _getNotes();
-        var folderSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var folderSegmentsSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var tagSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var seenNoteKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var uniqueNotes = new List<NoteCardItem>();
@@ -33,7 +33,14 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
         foreach (var n in notes)
         {
             if (!string.IsNullOrWhiteSpace(n.FolderName))
-                folderSet.Add(n.FolderName.Trim());
+            {
+                var folderPath = n.FolderName.Trim();
+                var segments = folderPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var segment in segments)
+                {
+                    folderSegmentsSet.Add(segment.Trim());
+                }
+            }
             foreach (var t in n.TagLabels)
                 if (!string.IsNullOrWhiteSpace(t))
                     tagSet.Add(t.Trim());
@@ -42,7 +49,7 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
                 uniqueNotes.Add(n);
         }
 
-        var folders = folderSet.OrderBy(f => f).ToList();
+        var folderSegments = folderSegmentsSet.OrderBy(f => f).ToList();
         var tags = tagSet.OrderBy(t => t).ToList();
         var nodes = new List<GraphNode>();
         var step = GraphPaintOptions.GridStep;
@@ -63,24 +70,22 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
         }
 
         var maxNotesInColumn = 0;
-        foreach (var folderName in folders)
+        foreach (var folderName in notesByFolder.Keys)
         {
             if (notesByFolder.TryGetValue(folderName, out var list) && list.Count > maxNotesInColumn)
                 maxNotesInColumn = list.Count;
         }
-        if (notesByFolder.TryGetValue("", out var noFolder) && noFolder.Count > maxNotesInColumn)
-            maxNotesInColumn = noFolder.Count;
         if (maxNotesInColumn == 0)
             maxNotesInColumn = 1;
         var yTags = yNotes + maxNotesInColumn * step;
 
-        for (var i = 0; i < folders.Count; i++)
+        for (var i = 0; i < folderSegments.Count; i++)
         {
             nodes.Add(new GraphNode
             {
-                Id = "f_" + folders[i],
+                Id = "f_" + folderSegments[i],
                 Type = GraphNodeType.Folder,
-                Label = folders[i],
+                Label = folderSegments[i],
                 X = baseX + i * step,
                 Y = yFolders,
                 Color = FolderColor
@@ -88,12 +93,40 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
         }
 
         var noteIndex = 0;
-        foreach (var folderName in folders)
+        foreach (var kvp in notesByFolder.OrderBy(k => k.Key))
         {
-            if (!notesByFolder.TryGetValue(folderName, out var folderNotes))
+            var folderPath = kvp.Key;
+            var folderNotes = kvp.Value;
+            if (string.IsNullOrWhiteSpace(folderPath))
+            {
+                var folderX = folderSegments.Count > 0 ? baseX + folderSegments.Count * step : baseX;
+                for (var j = 0; j < folderNotes.Count; j++)
+                {
+                    var note = folderNotes[j];
+                    nodes.Add(new GraphNode
+                    {
+                        Id = "n_" + noteIndex,
+                        Type = GraphNodeType.Note,
+                        Label = note.Title?.Length > 20 ? note.Title[..17] + "..." : (note.Title ?? ""),
+                        X = folderX,
+                        Y = yNotes + j * step,
+                        Color = NoteColor
+                    });
+                    noteIndex++;
+                }
                 continue;
-            var folderIdx = folders.IndexOf(folderName);
-            var folderX = baseX + folderIdx * step;
+            }
+
+            var segments = folderPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length == 0)
+                continue;
+
+            var lastSegment = segments[segments.Length - 1].Trim();
+            var lastSegmentIdx = folderSegments.IndexOf(lastSegment);
+            if (lastSegmentIdx < 0)
+                continue;
+
+            var noteColX = baseX + lastSegmentIdx * step;
             for (var j = 0; j < folderNotes.Count; j++)
             {
                 var note = folderNotes[j];
@@ -102,25 +135,7 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
                     Id = "n_" + noteIndex,
                     Type = GraphNodeType.Note,
                     Label = note.Title?.Length > 20 ? note.Title[..17] + "..." : (note.Title ?? ""),
-                    X = folderX,
-                    Y = yNotes + j * step,
-                    Color = NoteColor
-                });
-                noteIndex++;
-            }
-        }
-        if (notesByFolder.TryGetValue("", out var noFolderNotes))
-        {
-            var folderX = folders.Count > 0 ? baseX + folders.Count * step : baseX;
-            for (var j = 0; j < noFolderNotes.Count; j++)
-            {
-                var note = noFolderNotes[j];
-                nodes.Add(new GraphNode
-                {
-                    Id = "n_" + noteIndex,
-                    Type = GraphNodeType.Note,
-                    Label = note.Title?.Length > 20 ? note.Title[..17] + "..." : (note.Title ?? ""),
-                    X = folderX,
+                    X = noteColX,
                     Y = yNotes + j * step,
                     Color = NoteColor
                 });
@@ -156,12 +171,6 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
             if (seenKeys.Add(key))
                 uniqueNotes.Add(n);
         }
-        var folders = uniqueNotes
-            .Select(n => string.IsNullOrWhiteSpace(n.FolderName) ? "" : n.FolderName!.Trim())
-            .Distinct()
-            .OrderBy(f => f)
-            .Where(f => !string.IsNullOrEmpty(f))
-            .ToList();
         var notesByFolder = new Dictionary<string, List<NoteCardItem>>(StringComparer.OrdinalIgnoreCase);
         foreach (var n in uniqueNotes)
         {
@@ -174,17 +183,10 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
             list.Add(n);
         }
         var noteKeys = new List<string>();
-        foreach (var folderName in folders)
+        foreach (var kvp in notesByFolder.OrderBy(k => k.Key))
         {
-            if (!notesByFolder.TryGetValue(folderName, out var folderNotes))
-                continue;
-            foreach (var note in folderNotes)
+            foreach (var note in kvp.Value)
                 noteKeys.Add((note.Title ?? "").Trim() + "|" + (note.FolderName ?? "").Trim());
-        }
-        if (notesByFolder.TryGetValue("", out var noFolderNotes))
-        {
-            foreach (var note in noFolderNotes)
-                noteKeys.Add((note.Title ?? "").Trim() + "|");
         }
         var keyToNoteId = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         for (var i = 0; i < noteKeys.Count; i++)
@@ -192,16 +194,49 @@ public sealed class NotesGraphDataProvider : IGraphDataProvider
 
         var edges = new List<GraphEdge>();
         var addedEdges = new HashSet<(string From, string To)>();
+
+        foreach (var kvp in notesByFolder.OrderBy(k => k.Key))
+        {
+            var folderPath = kvp.Key;
+            if (string.IsNullOrWhiteSpace(folderPath))
+                continue;
+
+            var segments = folderPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length < 2)
+                continue;
+
+            for (var i = 0; i < segments.Length - 1; i++)
+            {
+                var parentSegment = segments[i].Trim();
+                var childSegment = segments[i + 1].Trim();
+                var parentId = "f_" + parentSegment;
+                var childId = "f_" + childSegment;
+
+                if (nodes.Any(n => n.Id == parentId) && nodes.Any(n => n.Id == childId) && addedEdges.Add((parentId, childId)))
+                {
+                    edges.Add(new GraphEdge { From = parentId, To = childId, Type = GraphEdgeType.InFolder });
+                }
+            }
+        }
+
         foreach (var note in notes)
         {
             var key = (note.Title ?? "").Trim() + "|" + (note.FolderName ?? "").Trim();
             if (!keyToNoteId.TryGetValue(key, out var noteId)) continue;
+
             if (!string.IsNullOrWhiteSpace(note.FolderName))
             {
-                var folderId = "f_" + note.FolderName.Trim();
-                if (nodes.Any(n => n.Id == folderId) && addedEdges.Add((noteId, folderId)))
-                    edges.Add(new GraphEdge { From = noteId, To = folderId, Type = GraphEdgeType.InFolder });
+                var folderPath = note.FolderName.Trim();
+                var segments = folderPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                if (segments.Length > 0)
+                {
+                    var lastSegment = segments[segments.Length - 1].Trim();
+                    var folderId = "f_" + lastSegment;
+                    if (nodes.Any(n => n.Id == folderId) && addedEdges.Add((noteId, folderId)))
+                        edges.Add(new GraphEdge { From = noteId, To = folderId, Type = GraphEdgeType.InFolder });
+                }
             }
+
             foreach (var tag in note.TagLabels)
             {
                 if (string.IsNullOrWhiteSpace(tag)) continue;

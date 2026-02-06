@@ -12,6 +12,7 @@ public class PresetItem
     public int? DurationMinutes { get; set; }
     public bool IsSticker { get; set; }
     public string ColorHex { get; set; }
+    public string? FolderName { get; set; }
     public List<string> TagLabels { get; set; } = new();
 
     public string Details =>
@@ -44,13 +45,14 @@ public class PresetItem
         ParseDetails(details);
     }
 
-    public PresetItem(string title, int transparencyPercent, int? durationMinutes, bool isSticker, string colorHex, IReadOnlyList<string>? tagLabels = null)
+    public PresetItem(string title, int transparencyPercent, int? durationMinutes, bool isSticker, string colorHex, IReadOnlyList<string>? tagLabels = null, string? folderName = null)
     {
         Title = title;
         TransparencyPercent = transparencyPercent;
         DurationMinutes = durationMinutes;
         IsSticker = isSticker;
         ColorHex = colorHex;
+        FolderName = folderName;
         if (tagLabels != null)
             TagLabels = tagLabels.ToList();
     }
